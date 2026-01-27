@@ -1,0 +1,136 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - msp-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dgs-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - dgs-network
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - dgs-network
+
+  autenticacao:
+    build:
+      context: .
+      dockerfile: autenticacao/Dockerfile
+    container_name: ms-autenticacao
+    depends_on:
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - AGENDAMENTO_SECRET=${AGENDAMENTO_SECRET}
+      - HISTORICO_SECRET=${HISTORICO_SECRET}
+      - NOTIFICACOES_SECRET=${NOTIFICACOES_SECRET}
+    networks:
+      - dgs-network
+
+  agendamento:
+    build:
+      context: .
+      dockerfile: agendamento/Dockerfile
+    container_name: ms-agendamento
+    depends_on:
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - AGENDAMENTO_SECRET=${AGENDAMENTO_SECRET}
+    networks:
+      - dgs-network
+
+  historico:
+    build:
+      context: .
+      dockerfile: historico/Dockerfile
+    container_name: ms-historico
+    depends_on:
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - HISTORICO_SECRET=${HISTORICO_SECRET}
+    networks:
+      - dgs-network
+
+  notificacoes:
+    build:
+      context: .
+      dockerfile: notificacoes/Dockerfile
+    container_name: ms-notificacoes
+    depends_on:
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - NOTIFICACOES_SECRET=${NOTIFICACOES_SECRET}
+    networks:
+      - dgs-network
+
+networks:
+  dgs-network:
+    driver: bridge
