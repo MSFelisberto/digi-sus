@@ -7,6 +7,10 @@ import br.com.dgs.autenticacao.application.ports.outbound.FuncionarioRepository;
 import br.com.dgs.autenticacao.application.ports.outbound.PacienteRepository;
 import br.com.dgs.autenticacao.application.ports.outbound.PasswordEncoder;
 import br.com.dgs.autenticacao.application.ports.outbound.TokenService;
+import br.com.dgs.autenticacao.domain.funcionario.model.Funcionario;
+import br.com.dgs.autenticacao.domain.paciente.model.Paciente;
+import br.com.dgs.autenticacao.domain.shared.model.Email;
+import br.com.dgs.autenticacao.domain.shared.model.Senha;
 import org.springframework.security.authentication.BadCredentialsException;
 
 public class AutenticacaoUseCaseImpl implements AutenticacaoUseCase {

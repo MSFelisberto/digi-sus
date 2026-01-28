@@ -1,3 +1,5 @@
+package br.com.dgs.autenticacao.application.services;
+
 import br.com.dgs.autenticacao.application.dto.CadastrarPacienteCommand;
 import br.com.dgs.autenticacao.application.dto.EnderecoDTO;
 import br.com.dgs.autenticacao.application.dto.PacienteOutput;
@@ -5,6 +7,13 @@ import br.com.dgs.autenticacao.application.dto.ValidarPacienteQuery;
 import br.com.dgs.autenticacao.application.ports.inbound.PacienteUseCase;
 import br.com.dgs.autenticacao.application.ports.outbound.PacienteRepository;
 import br.com.dgs.autenticacao.application.ports.outbound.PasswordEncoder;
+import br.com.dgs.autenticacao.domain.paciente.exception.PacienteBusinessException;
+import br.com.dgs.autenticacao.domain.paciente.exception.PacienteNotFoundException;
+import br.com.dgs.autenticacao.domain.paciente.model.Endereco;
+import br.com.dgs.autenticacao.domain.paciente.model.Paciente;
+import br.com.dgs.autenticacao.domain.paciente.model.PacienteId;
+import br.com.dgs.autenticacao.domain.shared.model.Email;
+import br.com.dgs.autenticacao.domain.shared.model.Senha;
 
 public class PacienteUseCaseImpl implements PacienteUseCase {
 

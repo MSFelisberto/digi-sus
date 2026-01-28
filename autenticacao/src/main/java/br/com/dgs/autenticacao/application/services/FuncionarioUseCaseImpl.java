@@ -6,6 +6,13 @@ import br.com.dgs.autenticacao.application.dto.FuncionarioOutput;
 import br.com.dgs.autenticacao.application.ports.inbound.FuncionarioUseCase;
 import br.com.dgs.autenticacao.application.ports.outbound.FuncionarioRepository;
 import br.com.dgs.autenticacao.application.ports.outbound.PasswordEncoder;
+import br.com.dgs.autenticacao.domain.funcionario.exception.FuncionarioBusinessException;
+import br.com.dgs.autenticacao.domain.funcionario.exception.FuncionarioNotFoundException;
+import br.com.dgs.autenticacao.domain.funcionario.model.Especialidade;
+import br.com.dgs.autenticacao.domain.funcionario.model.Funcionario;
+import br.com.dgs.autenticacao.domain.funcionario.model.FuncionarioId;
+import br.com.dgs.autenticacao.domain.shared.model.Email;
+import br.com.dgs.autenticacao.domain.shared.model.Senha;
 
 public class FuncionarioUseCaseImpl implements FuncionarioUseCase {
 

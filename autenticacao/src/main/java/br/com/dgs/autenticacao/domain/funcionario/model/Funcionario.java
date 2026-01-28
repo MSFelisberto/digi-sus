@@ -1,6 +1,8 @@
 package br.com.dgs.autenticacao.domain.funcionario.model;
 
 import br.com.dgs.autenticacao.domain.funcionario.exception.FuncionarioBusinessException;
+import br.com.dgs.autenticacao.domain.shared.model.Email;
+import br.com.dgs.autenticacao.domain.shared.model.Senha;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
