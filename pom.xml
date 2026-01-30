@@ -16,6 +16,7 @@
         <module>historico</module>
         <module>autenticacao</module>
         <module>server</module>
+        <module>triagem</module>
     </modules>
 
     <properties>
