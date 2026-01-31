@@ -22,9 +22,21 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue triagemHistoricoQueue() {
+        return new Queue(RabbitConfig.QUEUE_TRIAGEM_HISTORICO, true);
+    }
+
+    @Bean
     public Binding bindingHistorico(Queue historicoQueue, TopicExchange notificacoesExchange) {
         return BindingBuilder.bind(historicoQueue)
                 .to(notificacoesExchange)
                 .with(RabbitConfig.ROUTING_KEY_HISTORICO);
+    }
+
+    @Bean
+    public Binding bindingTriagemHistorico(Queue triagemHistoricoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(triagemHistoricoQueue)
+                .to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_TRIAGEM_HISTORICO);
     }
 }

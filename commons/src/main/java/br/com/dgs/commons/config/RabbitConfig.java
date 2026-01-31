@@ -9,9 +9,13 @@ public class RabbitConfig {
     public static final String QUEUE_CANCELAR = "notificacao.cancelar.queue";
     public static final String QUEUE_REAGENDAR = "notificacao.reagendar.queue";
     public static final String QUEUE_HISTORICO = "notificacao.historico.queue";
+    public static final String QUEUE_TRIAGEM_ATENDIMENTO = "triagem.atendimento.queue";
+    public static final String QUEUE_TRIAGEM_HISTORICO = "triagem.historico.queue";
 
     public static final String ROUTING_KEY_HISTORICO = "notificacao.historico";
     public static final String ROUTING_KEY_AGENDAR = "notificacao.agendar";
     public static final String ROUTING_KEY_CANCELAR = "notificacao.cancelar";
     public static final String ROUTING_KEY_REAGENDAR = "notificacao.reagendar";
+    public static final String ROUTING_KEY_TRIAGEM_ATENDIMENTO = "triagem.atendimento";
+    public static final String ROUTING_KEY_TRIAGEM_HISTORICO = "triagem.historico";
 }

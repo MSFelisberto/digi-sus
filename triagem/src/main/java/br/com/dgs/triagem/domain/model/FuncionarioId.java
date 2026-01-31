@@ -2,12 +2,12 @@ package br.com.dgs.triagem.domain.model;
 
 import java.util.Objects;
 
-public class PacienteId {
+public class FuncionarioId {
     private final Long value;
 
-    public PacienteId(Long value) {
+    public FuncionarioId(Long value) {
         if (value == null || value <= 0) {
-            throw new IllegalArgumentException("ID do paciente deve ser um número positivo");
+            throw new IllegalArgumentException("ID do funcionário deve ser um número positivo");
         }
         this.value = value;
     }
@@ -20,7 +20,7 @@ public class PacienteId {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PacienteId that = (PacienteId) o;
+        FuncionarioId that = (FuncionarioId) o;
         return Objects.equals(value, that.value);
     }
 
