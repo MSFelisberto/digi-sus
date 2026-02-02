@@ -3,6 +3,7 @@ package br.com.dgs.agendamento.application.services;
 import br.com.dgs.agendamento.application.dto.*;
 import br.com.dgs.agendamento.application.ports.inbound.AgendamentoUseCase;
 import br.com.dgs.agendamento.application.ports.outbound.ConsultaRepository;
+import br.com.dgs.agendamento.application.ports.outbound.HorarioDisponivelRepository;
 import br.com.dgs.agendamento.application.ports.outbound.NotificationService;
 import br.com.dgs.agendamento.application.ports.outbound.PacienteService;
 import br.com.dgs.agendamento.domain.exception.AuthorizationException;
@@ -18,14 +19,17 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
     private final ConsultaRepository consultaRepository;
     private final PacienteService pacienteService;
     private final NotificationService notificationService;
+    private final HorarioDisponivelRepository horarioDisponivelRepository;
 
     public AgendamentoUseCaseImpl(
             ConsultaRepository consultaRepository,
             PacienteService pacienteService,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            HorarioDisponivelRepository horarioDisponivelRepository) {
         this.consultaRepository = consultaRepository;
         this.pacienteService = pacienteService;
         this.notificationService = notificationService;
+        this.horarioDisponivelRepository = horarioDisponivelRepository;
     }
 
     @Override
@@ -79,6 +83,13 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         consulta.cancelar();
 
         consultaRepository.save(consulta);
+
+        // Liberar o horário associado, se existir
+        horarioDisponivelRepository.findByConsultaId(consultaId)
+                .ifPresent(horario -> {
+                    horario.liberar();
+                    horarioDisponivelRepository.save(horario);
+                });
 
         notificationService.notificarCancelamento(consulta);
     }

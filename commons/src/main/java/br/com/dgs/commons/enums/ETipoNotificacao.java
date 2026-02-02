@@ -5,7 +5,10 @@ public enum ETipoNotificacao {
     AGENDAR("notificacao.agendar"),
     CANCELAR("notificacao.cancelar"),
     REAGENDAR("notificacao.reagendar"),
-    HISTORICO("notificacao.historico");
+    HISTORICO("notificacao.historico"),
+    EXAME_SOLICITAR("notificacao.exame.solicitar"),
+    EXAME_AGENDAR("notificacao.exame.agendar"),
+    EXAME_CANCELAR("notificacao.exame.cancelar");
 
     private final String routingKey;
 
