@@ -18,4 +18,12 @@ public class RabbitConfig {
     public static final String ROUTING_KEY_REAGENDAR = "notificacao.reagendar";
     public static final String ROUTING_KEY_TRIAGEM_ATENDIMENTO = "triagem.atendimento";
     public static final String ROUTING_KEY_TRIAGEM_HISTORICO = "triagem.historico";
+
+    public static final String QUEUE_EXAME_SOLICITAR = "notificacao.exame.queue";
+    public static final String QUEUE_EXAME_AGENDAR = "notificacao.exame.agendar";
+    public static final String QUEUE_EXAME_CANCELAR = "notificacao.exame.cancelar";
+
+    public static final String ROUTING_KEY_EXAME_SOLICITAR = "notificacao.exame.solicitar";
+    public static final String ROUTING_KEY_EXAME_AGENDAR = "notificacao.exame.agendar";
+    public static final String ROUTING_KEY_EXAME_CANCELAR = "notificacao.exame.cancelar";
 }

@@ -4,5 +4,7 @@ public enum TipoFuncionario {
     ADMIN,
     MEDICO,
     ENFERMEIRO,
-    SISTEMA
+    SISTEMA,
+    TECNICO_LABORATORIO,
+    ATENDENTE
 }

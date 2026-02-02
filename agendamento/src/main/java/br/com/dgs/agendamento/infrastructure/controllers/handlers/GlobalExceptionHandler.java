@@ -1,9 +1,6 @@
 package br.com.dgs.agendamento.infrastructure.controllers.handlers;
 
-import br.com.dgs.agendamento.domain.exception.AuthorizationException;
-import br.com.dgs.agendamento.domain.exception.ConsultaBusinessException;
-import br.com.dgs.agendamento.domain.exception.ConsultaNotFoundException;
-import br.com.dgs.agendamento.domain.exception.PacienteNotFoundException;
+import br.com.dgs.agendamento.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,11 +43,59 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AgendaNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAgendaNotFoundException(AgendaNotFoundException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Agenda Não Encontrada", "message", ex.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(AgendaBusinessException.class)
+    public ResponseEntity<Map<String, String>> handleAgendaBusinessException(AgendaBusinessException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Regra de Negócio Violada", "message", ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(HorarioIndisponivelException.class)
+    public ResponseEntity<Map<String, String>> handleHorarioIndisponivelException(HorarioIndisponivelException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Horário Indisponível", "message", ex.getMessage()),
+                HttpStatus.CONFLICT
+        );
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return new ResponseEntity<>(
                 Map.of("error", "Argumento Inválido", "message", ex.getMessage()),
                 HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(ExameBusinessException.class)
+    public ResponseEntity<Map<String, String>> handleExameBusinessException(ExameBusinessException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Regra de Negócio de Exame Violada", "message", ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(SolicitacaoExameNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleSolicitacaoExameNotFoundException(SolicitacaoExameNotFoundException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Solicitação de Exame Não Encontrada", "message", ex.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(VagaExameIndisponivelException.class)
+    public ResponseEntity<Map<String, String>> handleVagaExameIndisponivelException(VagaExameIndisponivelException ex) {
+        return new ResponseEntity<>(
+                Map.of("error", "Vaga de Exame Indisponível", "message", ex.getMessage()),
+                HttpStatus.CONFLICT
         );
     }
 }

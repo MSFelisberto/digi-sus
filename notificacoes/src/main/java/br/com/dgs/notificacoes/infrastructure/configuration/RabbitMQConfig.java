@@ -46,4 +46,38 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(reagendarQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_REAGENDAR);
     }
 
+    @Bean
+    public Queue exameSolicitarQueue() {
+        return new Queue(RabbitConfig.QUEUE_EXAME_SOLICITAR, true);
+    }
+
+    @Bean
+    public Queue exameAgendarQueue() {
+        return new Queue(RabbitConfig.QUEUE_EXAME_AGENDAR, true);
+    }
+
+    @Bean
+    public Queue exameCancelarQueue() {
+        return new Queue(RabbitConfig.QUEUE_EXAME_CANCELAR, true);
+    }
+
+    // Exame bindings
+    @Bean
+    public Binding bindingExameSolicitar(Queue exameSolicitarQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(exameSolicitarQueue).to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_EXAME_SOLICITAR);
+    }
+
+    @Bean
+    public Binding bindingExameAgendar(Queue exameAgendarQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(exameAgendarQueue).to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_EXAME_AGENDAR);
+    }
+
+    @Bean
+    public Binding bindingExameCancelar(Queue exameCancelarQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(exameCancelarQueue).to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_EXAME_CANCELAR);
+    }
+
 }

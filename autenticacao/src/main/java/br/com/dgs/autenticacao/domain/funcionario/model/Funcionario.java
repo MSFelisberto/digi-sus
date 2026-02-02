@@ -125,6 +125,18 @@ public class Funcionario {
                     throw new FuncionarioBusinessException("Admin não pode ter especialidade");
                 }
                 break;
+            case TECNICO_LABORATORIO:
+            case ATENDENTE:
+                if (crm != null && !crm.trim().isEmpty()) {
+                    throw new FuncionarioBusinessException(tipo.name() + " não pode ter CRM");
+                }
+                if (coren != null && !coren.trim().isEmpty()) {
+                    throw new FuncionarioBusinessException(tipo.name() + " não pode ter COREN");
+                }
+                if (especialidade != null) {
+                    throw new FuncionarioBusinessException(tipo.name() + " não pode ter especialidade");
+                }
+                break;
         }
     }
 
