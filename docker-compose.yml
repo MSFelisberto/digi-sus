@@ -131,6 +131,22 @@ services:
     networks:
       - dgs-network
 
+  triagem:
+    build:
+      context: .
+      dockerfile: triagem/Dockerfile
+    container_name: ms-triagem
+    depends_on:
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TRIAGEM_SECRET=${TRIAGEM_SECRET}
+    networks:
+      - dgs-network
+
 networks:
   dgs-network:
     driver: bridge
