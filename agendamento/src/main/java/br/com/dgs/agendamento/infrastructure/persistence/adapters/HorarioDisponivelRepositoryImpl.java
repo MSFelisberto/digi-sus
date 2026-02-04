@@ -65,6 +65,14 @@ public class HorarioDisponivelRepositoryImpl implements HorarioDisponivelReposit
                 .map(this::toDomain);
     }
 
+    @Override
+    @Transactional
+    public Optional<HorarioDisponivel> findByMedicoIdAndDataHoraParaReserva(
+            MedicoId medicoId, LocalDateTime dataHora) {
+        return jpaRepository.findByMedicoIdAndDataHoraForUpdate(medicoId.getValue(), dataHora)
+                .map(this::toDomain);
+    }
+
     private HorarioDisponivelEntity toEntity(HorarioDisponivel horario) {
         HorarioDisponivelEntity entity = new HorarioDisponivelEntity();
         if (horario.getId() != null) {

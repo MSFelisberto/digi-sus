@@ -97,6 +97,32 @@ public class AgendamentoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/consultas")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ConsultaResponseDTO>> listarConsultasFuturas(
+            Authentication authentication) {
+
+        UserPrincipal principal = ((JwtAuthenticationToken) authentication).getPrincipal();
+        List<String> roles = principal.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        AuthenticatedUser currentUser = new AuthenticatedUser(
+                principal.getId(),
+                principal.getEmail(),
+                roles
+        );
+
+        ListarConsultasFuturasQuery query = new ListarConsultasFuturasQuery(currentUser);
+
+        List<ConsultaResponseDTO> response = agendamentoUseCase.listarConsultasFuturas(query)
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
     private ConsultaResponseDTO toResponseDTO(ConsultaOutput output) {
         return new ConsultaResponseDTO(
                 output.id(),

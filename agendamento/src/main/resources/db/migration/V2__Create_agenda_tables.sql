@@ -3,7 +3,7 @@ CREATE TABLE tb_agendas (
     medico_id BIGINT NOT NULL,
     dia_semana VARCHAR(20) NOT NULL,
     hora_inicio TIME NOT NULL,
-    hora_fima TIME NOT NULL,
+    hora_fim TIME NOT NULL,
     duracao_slot_minutos INTEGER NOT NULL,
     especialidade VARCHAR(255) NOT NULL,
     ativa BOOLEAN NOT NULL DEFAULT TRUE,

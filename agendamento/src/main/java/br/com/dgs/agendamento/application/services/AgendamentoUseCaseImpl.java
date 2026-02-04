@@ -8,6 +8,7 @@ import br.com.dgs.agendamento.application.ports.outbound.NotificationService;
 import br.com.dgs.agendamento.application.ports.outbound.PacienteService;
 import br.com.dgs.agendamento.domain.exception.AuthorizationException;
 import br.com.dgs.agendamento.domain.exception.ConsultaNotFoundException;
+import br.com.dgs.agendamento.domain.exception.HorarioIndisponivelException;
 import br.com.dgs.agendamento.domain.exception.PacienteNotFoundException;
 import br.com.dgs.agendamento.domain.model.*;
 
@@ -42,6 +43,19 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         MedicoId medicoId = new MedicoId(command.medicoId());
         Especialidade especialidade = new Especialidade(command.especialidade());
 
+        HorarioDisponivel horario = horarioDisponivelRepository
+                .findByMedicoIdAndDataHoraParaReserva(medicoId, command.dataHora())
+                .orElseThrow(() -> new HorarioIndisponivelException(
+                        "Não existe horário disponível para o médico " + command.medicoId()
+                        + " na data/hora " + command.dataHora()
+                        + ". Verifique se a agenda do médico foi criada e os horários foram gerados."));
+
+        if (!horario.isDisponivel()) {
+            throw new HorarioIndisponivelException(
+                    "Horário " + command.dataHora() + " do médico " + command.medicoId()
+                    + " já está ocupado.");
+        }
+
         Consulta consulta = new Consulta(
                 pacienteId,
                 medicoId,
@@ -50,6 +64,9 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         );
 
         Consulta consultaSalva = consultaRepository.save(consulta);
+
+        horario.reservar(consultaSalva.getId());
+        horarioDisponivelRepository.save(horario);
 
         notificationService.notificarAgendamento(consultaSalva);
 
@@ -65,9 +82,34 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         MedicoId novoMedico = new MedicoId(command.medicoId());
         Especialidade novaEspecialidade = new Especialidade(command.especialidade());
 
-        consulta.reagendar(command.dataHora(), novoMedico, novaEspecialidade);
+        // Liberar o slot antigo (se existir)
+        horarioDisponivelRepository.findByConsultaId(consultaId)
+                .ifPresent(slotAntigo -> {
+                    slotAntigo.liberar();
+                    horarioDisponivelRepository.save(slotAntigo);
+                });
 
+        // Buscar e validar o novo slot com lock
+        HorarioDisponivel novoSlot = horarioDisponivelRepository
+                .findByMedicoIdAndDataHoraParaReserva(novoMedico, command.dataHora())
+                .orElseThrow(() -> new HorarioIndisponivelException(
+                        "Não existe horário disponível para o médico " + command.medicoId()
+                        + " na data/hora " + command.dataHora()
+                        + ". Verifique se a agenda do médico foi criada e os horários foram gerados."));
+
+        if (!novoSlot.isDisponivel()) {
+            throw new HorarioIndisponivelException(
+                    "Horário " + command.dataHora() + " do médico " + command.medicoId()
+                    + " já está ocupado.");
+        }
+
+        // Reagendar a consulta
+        consulta.reagendar(command.dataHora(), novoMedico, novaEspecialidade);
         Consulta consultaReagendada = consultaRepository.save(consulta);
+
+        // Reservar o novo slot
+        novoSlot.reservar(consultaReagendada.getId());
+        horarioDisponivelRepository.save(novoSlot);
 
         notificationService.notificarReagendamento(consultaReagendada);
 
@@ -107,6 +149,26 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
 
         return consultaRepository.findByPacienteId(pacienteId)
                 .stream()
+                .map(this::mapToOutput)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConsultaOutput> listarConsultasFuturas(ListarConsultasFuturasQuery query) {
+        AuthenticatedUser user = query.currentUser();
+        List<Consulta> consultas;
+
+        if (user.hasRole("ADMIN")) {
+            consultas = consultaRepository.findAllFuturas();
+        } else if (user.hasRole("MEDICO")) {
+            MedicoId medicoId = new MedicoId(user.getId());
+            consultas = consultaRepository.findFuturasByMedicoId(medicoId);
+        } else {
+            PacienteId pacienteId = new PacienteId(user.getId());
+            consultas = consultaRepository.findFuturasByPacienteId(pacienteId);
+        }
+
+        return consultas.stream()
                 .map(this::mapToOutput)
                 .collect(Collectors.toList());
     }

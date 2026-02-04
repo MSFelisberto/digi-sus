@@ -9,4 +9,5 @@ public interface AgendamentoUseCase {
     ConsultaOutput reagendarConsulta(ReagendarConsultaCommand command);
     void cancelarConsulta(CancelarConsultaCommand command);
     List<ConsultaOutput> listarConsultasPorPaciente(ListarConsultasQuery query);
+    List<ConsultaOutput> listarConsultasFuturas(ListarConsultasFuturasQuery query);
 }

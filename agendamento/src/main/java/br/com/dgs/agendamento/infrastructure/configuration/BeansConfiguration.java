@@ -27,9 +27,10 @@ public class BeansConfiguration {
     @Bean
     public AgendaUseCase agendaUseCase(
             AgendaRepository agendaRepository,
-            HorarioDisponivelRepository horarioDisponivelRepository) {
+            HorarioDisponivelRepository horarioDisponivelRepository,
+            FuncionarioService funcionarioService) {
 
-        return new AgendaUseCaseImpl(agendaRepository, horarioDisponivelRepository);
+        return new AgendaUseCaseImpl(agendaRepository, horarioDisponivelRepository, funcionarioService);
     }
 
     @Bean

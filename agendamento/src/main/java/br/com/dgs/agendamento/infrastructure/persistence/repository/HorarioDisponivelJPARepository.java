@@ -21,4 +21,10 @@ public interface HorarioDisponivelJPARepository extends JpaRepository<HorarioDis
     Optional<HorarioDisponivelEntity> findByIdForUpdate(@Param("id") Long id);
 
     Optional<HorarioDisponivelEntity> findByConsultaId(Long consultaId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT h FROM HorarioDisponivelEntity h WHERE h.medicoId = :medicoId AND h.dataHora = :dataHora")
+    Optional<HorarioDisponivelEntity> findByMedicoIdAndDataHoraForUpdate(
+            @Param("medicoId") Long medicoId,
+            @Param("dataHora") LocalDateTime dataHora);
 }

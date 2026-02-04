@@ -135,8 +135,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"auth",
+								"login"
+							]
 						}
 					}
 				},
@@ -173,8 +179,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"auth",
+								"login"
+							]
 						}
 					}
 				},
@@ -211,8 +223,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"auth",
+								"login"
+							]
 						}
 					}
 				},
@@ -249,8 +267,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"auth",
+								"login"
+							]
 						}
 					}
 				}
@@ -298,8 +322,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/funcionarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "funcionarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"funcionarios"
+							]
 						}
 					}
 				},
@@ -339,8 +368,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/funcionarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "funcionarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"funcionarios"
+							]
 						}
 					}
 				},
@@ -377,8 +411,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"autenticacao",
+								"auth",
+								"login"
+							]
 						}
 					}
 				}
@@ -443,8 +483,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda"
+							]
 						}
 					}
 				},
@@ -496,8 +541,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaId}}/gerar-horarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda", "{{agendaId}}", "gerar-horarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda",
+								"{{agendaId}}",
+								"gerar-horarios"
+							]
 						}
 					}
 				},
@@ -529,8 +581,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda/medico/{{medicoId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda", "medico", "{{medicoId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda",
+								"medico",
+								"{{medicoId}}"
+							]
 						}
 					}
 				},
@@ -581,8 +640,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "disponiveis"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
 							"query": [
 								{
 									"key": "especialidade",
@@ -638,8 +703,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "autoagendamento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"autoagendamento"
+							]
 						}
 					}
 				},
@@ -688,8 +759,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "disponiveis"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
 							"query": [
 								{
 									"key": "especialidade",
@@ -736,8 +813,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/paciente/1",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "paciente", "1"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"paciente",
+								"1"
+							],
 							"description": "O paciente seed geralmente tem ID 1. Ajuste se necessario."
 						}
 					}
@@ -767,8 +850,13 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/{{consultaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "{{consultaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"{{consultaId}}"
+							]
 						}
 					}
 				},
@@ -817,8 +905,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "disponiveis"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
 							"query": [
 								{
 									"key": "especialidade",
@@ -839,12 +933,31 @@
 			]
 		},
 		{
-			"name": "3 - Fluxo Consulta: Agendamento Tradicional",
-			"description": "Fluxo pre-existente: Medico/Enfermeiro agenda consulta diretamente (sem slots).",
+			"name": "3 - Fluxo Consulta: Agendamento Tradicional (Unificado com Slots)",
+			"description": "Fluxo unificado: Agendamento tradicional agora consome slots da agenda medica. Testa reserva de slot, double-booking, reagendamento com troca de slot, cancelamento com liberacao de slot e erro ao agendar sem agenda.",
 			"item": [
 				{
-					"name": "3.1 Medico agenda consulta tradicional",
+					"name": "3.1 Medico agenda consulta tradicional (consome slot 09:00)",
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Calcula a proxima segunda-feira (agenda eh MONDAY 08:00-12:00)",
+									"var today = new Date();",
+									"var dayOfWeek = today.getDay();",
+									"var daysUntilMonday = (8 - dayOfWeek) % 7;",
+									"if (daysUntilMonday === 0) daysUntilMonday = 7;",
+									"var nextMonday = new Date(today);",
+									"nextMonday.setDate(today.getDate() + daysUntilMonday);",
+									"var year = nextMonday.getFullYear();",
+									"var month = String(nextMonday.getMonth() + 1).padStart(2, '0');",
+									"var day = String(nextMonday.getDate()).padStart(2, '0');",
+									"pm.collectionVariables.set('dataHoraTradicional', year + '-' + month + '-' + day + 'T09:00:00');"
+								],
+								"type": "text/javascript"
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -852,22 +965,11 @@
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('consultaTradicionalId', json.id);",
-									"    pm.test('Consulta tradicional criada', function() {",
+									"    pm.test('Consulta tradicional criada com slot reservado', function() {",
 									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
 									"    });",
 									"}"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"var futuro = new Date();",
-									"futuro.setDate(futuro.getDate() + 7);",
-									"futuro.setHours(10, 0, 0, 0);",
-									"pm.collectionVariables.set('dataHoraConsulta', futuro.toISOString().replace('Z', ''));"
 								],
 								"type": "text/javascript"
 							}
@@ -887,23 +989,273 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"pacienteId\": 1,\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraConsulta}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+							"raw": "{\n    \"pacienteId\": 1,\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraTradicional}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", ""]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								""
+							]
 						}
 					}
 				},
 				{
-					"name": "3.2 Enfermeiro cancela consulta tradicional",
+					"name": "3.2 Verificar: slot 09:00 agora indisponivel",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 28);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    var dataHora = pm.collectionVariables.get('dataHoraTradicional');",
+									"    var encontrou = json.find(h => h.dataHora && h.dataHora.startsWith(dataHora.substring(0, 16)));",
+									"    pm.test('Slot 09:00 NAO aparece como disponivel (foi reservado)', function() {",
+									"        pm.expect(encontrou).to.be.undefined;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{pacienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
+							"query": [
+								{
+									"key": "especialidade",
+									"value": "CLINICA GERAL"
+								},
+								{
+									"key": "dataInicio",
+									"value": "{{dataInicio}}"
+								},
+								{
+									"key": "dataFim",
+									"value": "{{dataFim}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "3.3 Double-booking: mesmo horario retorna 409",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Cancelada (204)', function() {",
+									"pm.test('Double-booking bloqueado (409)', function() {",
+									"    pm.expect(pm.response.code).to.eql(409);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": 1,\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraTradicional}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "3.4 Reagendar consulta (09:00 -> 09:30)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var dataHora = pm.collectionVariables.get('dataHoraTradicional');",
+									"var dataHoraReagendamento = dataHora.replace('T09:00:00', 'T09:30:00');",
+									"pm.collectionVariables.set('dataHoraReagendamento', dataHoraReagendamento);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Consulta reagendada com sucesso', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraReagendamento}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaTradicionalId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"{{consultaTradicionalId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "3.5 Verificar: slot 09:00 liberado, slot 09:30 ocupado",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 28);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    var dataHoraOriginal = pm.collectionVariables.get('dataHoraTradicional');",
+									"    var slotLiberado = json.find(h => h.dataHora && h.dataHora.startsWith(dataHoraOriginal.substring(0, 16)));",
+									"    pm.test('Slot 09:00 voltou a ficar disponivel', function() {",
+									"        pm.expect(slotLiberado).to.not.be.undefined;",
+									"    });",
+									"    var dataHoraReag = pm.collectionVariables.get('dataHoraReagendamento');",
+									"    var slotOcupado = json.find(h => h.dataHora && h.dataHora.startsWith(dataHoraReag.substring(0, 16)));",
+									"    pm.test('Slot 09:30 agora indisponivel', function() {",
+									"        pm.expect(slotOcupado).to.be.undefined;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{pacienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
+							"query": [
+								{
+									"key": "especialidade",
+									"value": "CLINICA GERAL"
+								},
+								{
+									"key": "dataInicio",
+									"value": "{{dataInicio}}"
+								},
+								{
+									"key": "dataFim",
+									"value": "{{dataFim}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "3.6 Cancelar consulta tradicional",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Consulta cancelada (204)', function() {",
 									"    pm.expect(pm.response.code).to.eql(204);",
 									"});"
 								],
@@ -916,13 +1268,156 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{enfermeiroToken}}"
+								"value": "Bearer {{medicoToken}}"
 							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/{{consultaTradicionalId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "{{consultaTradicionalId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"{{consultaTradicionalId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "3.7 Verificar: slot 09:30 liberado apos cancelamento",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 28);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    var dataHoraReag = pm.collectionVariables.get('dataHoraReagendamento');",
+									"    var slotLiberado = json.find(h => h.dataHora && h.dataHora.startsWith(dataHoraReag.substring(0, 16)));",
+									"    pm.test('Slot 09:30 voltou a ficar disponivel apos cancelamento', function() {",
+									"        pm.expect(slotLiberado).to.not.be.undefined;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{pacienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"disponiveis"
+							],
+							"query": [
+								{
+									"key": "especialidade",
+									"value": "CLINICA GERAL"
+								},
+								{
+									"key": "dataInicio",
+									"value": "{{dataInicio}}"
+								},
+								{
+									"key": "dataFim",
+									"value": "{{dataFim}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "3.8 Agendamento sem agenda (terca-feira) retorna 409",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Calcula a proxima terca-feira (nao tem agenda nesse dia)",
+									"var today = new Date();",
+									"var dayOfWeek = today.getDay();",
+									"var daysUntilTuesday = (9 - dayOfWeek) % 7;",
+									"if (daysUntilTuesday === 0) daysUntilTuesday = 7;",
+									"var nextTuesday = new Date(today);",
+									"nextTuesday.setDate(today.getDate() + daysUntilTuesday);",
+									"var year = nextTuesday.getFullYear();",
+									"var month = String(nextTuesday.getMonth() + 1).padStart(2, '0');",
+									"var day = String(nextTuesday.getDate()).padStart(2, '0');",
+									"pm.collectionVariables.set('dataHoraSemAgenda', year + '-' + month + '-' + day + 'T10:00:00');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Agendamento sem agenda retorna 409', function() {",
+									"    pm.expect(pm.response.code).to.eql(409);",
+									"});",
+									"if (pm.response.code === 409) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Mensagem indica ausencia de horario', function() {",
+									"        pm.expect(json.message).to.include('horário disponível');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": 1,\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraSemAgenda}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								""
+							]
 						}
 					}
 				}
@@ -964,8 +1459,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/tipos",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "tipos"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"tipos"
+							]
 						}
 					}
 				},
@@ -997,8 +1498,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/tipos/{{tipoExameId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "tipos", "{{tipoExameId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"tipos",
+								"{{tipoExameId}}"
+							]
 						}
 					}
 				},
@@ -1040,8 +1548,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/tipos",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "tipos"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"tipos"
+							]
 						}
 					}
 				}
@@ -1090,8 +1604,15 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/agenda",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos", "agenda"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos",
+								"agenda"
+							]
 						}
 					}
 				},
@@ -1133,8 +1654,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/solicitacoes",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "solicitacoes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"solicitacoes"
+							]
 						}
 					}
 				},
@@ -1175,8 +1702,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/solicitacoes",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "solicitacoes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"solicitacoes"
+							]
 						}
 					}
 				},
@@ -1208,8 +1741,16 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/solicitacoes/paciente/1",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "solicitacoes", "paciente", "1"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"solicitacoes",
+								"paciente",
+								"1"
+							]
 						}
 					}
 				},
@@ -1263,8 +1804,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/vagas?tipoExameId={{tipoExameId}}&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos", "vagas"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos",
+								"vagas"
+							],
 							"query": [
 								{
 									"key": "tipoExameId",
@@ -1319,8 +1867,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos"
+							]
 						}
 					}
 				},
@@ -1371,8 +1925,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/vagas?tipoExameId={{tipoExameId}}&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos", "vagas"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos",
+								"vagas"
+							],
 							"query": [
 								{
 									"key": "tipoExameId",
@@ -1415,8 +1976,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/{{agendamentoExameId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos", "{{agendamentoExameId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos",
+								"{{agendamentoExameId}}"
+							]
 						}
 					}
 				},
@@ -1467,8 +2035,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/vagas?tipoExameId={{tipoExameId}}&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "agendamentos", "vagas"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"agendamentos",
+								"vagas"
+							],
 							"query": [
 								{
 									"key": "tipoExameId",
@@ -1521,8 +2096,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "autoagendamento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"autoagendamento"
+							]
 						}
 					}
 				},
@@ -1559,8 +2140,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "autoagendamento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"autoagendamento"
+							]
 						}
 					}
 				},
@@ -1597,8 +2184,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda"
+							]
 						}
 					}
 				},
@@ -1635,8 +2227,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/tipos",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "tipos"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"tipos"
+							]
 						}
 					}
 				},
@@ -1673,8 +2271,14 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/exames/solicitacoes",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "exames", "solicitacoes"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"exames",
+								"solicitacoes"
+							]
 						}
 					}
 				},
@@ -1703,8 +2307,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda/99999",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda", "99999"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda",
+								"99999"
+							]
 						}
 					}
 				},
@@ -1741,19 +2351,356 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "horarios", "autoagendamento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"autoagendamento"
+							]
 						}
 					}
 				}
 			]
 		},
 		{
-			"name": "7 - Desativar Agenda",
+			"name": "7 - Listagem de Consultas Futuras por Role",
+			"description": "Testa o endpoint GET /agendamento/consultas que retorna consultas futuras filtradas pelo papel do usuario: PACIENTE ve so as proprias, MEDICO ve as agendadas para ele, ADMIN ve todas.",
+			"item": [
+				{
+					"name": "7.1 Paciente auto-agenda consulta (setup para listagem)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('consultaListagemAutoId', json.id);",
+									"    pm.test('Consulta criada para teste de listagem', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{pacienteToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"horarioDisponivelId\": {{horarioDisponivelId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"horarios",
+								"autoagendamento"
+							]
+						}
+					}
+				},
+				{
+					"name": "7.2 Medico agenda consulta tradicional (setup para listagem)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Usa slot 10:00 na proxima segunda",
+									"var today = new Date();",
+									"var dayOfWeek = today.getDay();",
+									"var daysUntilMonday = (8 - dayOfWeek) % 7;",
+									"if (daysUntilMonday === 0) daysUntilMonday = 7;",
+									"var nextMonday = new Date(today);",
+									"nextMonday.setDate(today.getDate() + daysUntilMonday);",
+									"var year = nextMonday.getFullYear();",
+									"var month = String(nextMonday.getMonth() + 1).padStart(2, '0');",
+									"var day = String(nextMonday.getDate()).padStart(2, '0');",
+									"pm.collectionVariables.set('dataHoraListagem', year + '-' + month + '-' + day + 'T10:00:00');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('consultaListagemTradId', json.id);",
+									"    pm.test('Consulta tradicional criada para listagem', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": 1,\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraListagem}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "7.3 PACIENTE lista consultas futuras (ve so as proprias)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Paciente tem pelo menos 1 consulta futura', function() {",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"    pm.test('Todas as consultas sao do paciente logado', function() {",
+									"        var pacienteId = json[0].pacienteId;",
+									"        json.forEach(function(c) {",
+									"            pm.expect(c.pacienteId).to.eql(pacienteId);",
+									"        });",
+									"    });",
+									"    pm.test('Todas as consultas tem status AGENDADA', function() {",
+									"        json.forEach(function(c) {",
+									"            pm.expect(c.status).to.eql('AGENDADA');",
+									"        });",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{pacienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/consultas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"consultas"
+							]
+						}
+					}
+				},
+				{
+					"name": "7.4 MEDICO lista consultas futuras (ve as agendadas para ele)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    var medicoId = parseInt(pm.collectionVariables.get('medicoId'));",
+									"    pm.test('Medico tem pelo menos 2 consultas futuras', function() {",
+									"        pm.expect(json.length).to.be.greaterThan(1);",
+									"    });",
+									"    pm.test('Todas as consultas sao do medico logado', function() {",
+									"        json.forEach(function(c) {",
+									"            pm.expect(c.medicoId).to.eql(medicoId);",
+									"        });",
+									"    });",
+									"    pm.test('Todas as consultas tem status AGENDADA', function() {",
+									"        json.forEach(function(c) {",
+									"            pm.expect(c.status).to.eql('AGENDADA');",
+									"        });",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/consultas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"consultas"
+							]
+						}
+					}
+				},
+				{
+					"name": "7.5 ADMIN lista consultas futuras (ve todas)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Admin ve pelo menos 2 consultas futuras', function() {",
+									"        pm.expect(json.length).to.be.greaterThan(1);",
+									"    });",
+									"    pm.test('Todas as consultas tem status AGENDADA', function() {",
+									"        json.forEach(function(c) {",
+									"            pm.expect(c.status).to.eql('AGENDADA');",
+									"        });",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/consultas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"consultas"
+							]
+						}
+					}
+				},
+				{
+					"name": "7.6 Limpar: cancelar consulta auto-agendada",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Consulta cancelada (204)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaListagemAutoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"{{consultaListagemAutoId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "7.7 Limpar: cancelar consulta tradicional",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Consulta cancelada (204)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{medicoToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaListagemTradId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"{{consultaListagemTradId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8 - Desativar Agenda",
 			"description": "Testa a desativacao de uma agenda pelo medico.",
 			"item": [
 				{
-					"name": "7.1 Medico desativa a agenda",
+					"name": "8.1 Medico desativa a agenda",
 					"event": [
 						{
 							"listen": "test",
@@ -1777,8 +2724,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "agenda", "{{agendaId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agendamento",
+								"agenda",
+								"{{agendaId}}"
+							]
 						}
 					}
 				}

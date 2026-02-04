@@ -1,3 +1,11 @@
 /postgres-data/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/
+/notificacoes/target/
+/historico/target/
+/gateway/target/
+/commons/target/
+/autenticacao/target/
+/agendamento/target/
+/server/target/
+/triagem/target/

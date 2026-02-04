@@ -9,5 +9,6 @@ public record CriarAgendaCommand(
         LocalTime horaInicio,
         LocalTime horaFim,
         int duracaoSlotMinutos,
-        String especialidade
+        String especialidade,
+        AuthenticatedUser currentUser
 ) {}

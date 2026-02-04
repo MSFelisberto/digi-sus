@@ -6,6 +6,7 @@ import br.com.dgs.agendamento.infrastructure.persistence.entity.ConsultaEntity;
 import br.com.dgs.agendamento.infrastructure.persistence.repository.ConsultaJPARepository;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +36,33 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
     @Override
     public List<Consulta> findByPacienteId(PacienteId pacienteId) {
         return jpaRepository.findByPacienteId(pacienteId.getValue())
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Consulta> findFuturasByPacienteId(PacienteId pacienteId) {
+        return jpaRepository.findByPacienteIdAndCanceladaFalseAndDataHoraAfter(
+                        pacienteId.getValue(), LocalDateTime.now())
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Consulta> findFuturasByMedicoId(MedicoId medicoId) {
+        return jpaRepository.findByMedicoIdAndCanceladaFalseAndDataHoraAfter(
+                        medicoId.getValue(), LocalDateTime.now())
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Consulta> findAllFuturas() {
+        return jpaRepository.findByCanceladaFalseAndDataHoraAfterOrderByDataHoraAsc(
+                        LocalDateTime.now())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());

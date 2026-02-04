@@ -4,6 +4,7 @@ import br.com.dgs.agendamento.domain.model.ConsultaId;
 import br.com.dgs.agendamento.domain.model.Especialidade;
 import br.com.dgs.agendamento.domain.model.HorarioDisponivel;
 import br.com.dgs.agendamento.domain.model.HorarioDisponivelId;
+import br.com.dgs.agendamento.domain.model.MedicoId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,4 +18,5 @@ public interface HorarioDisponivelRepository {
     List<HorarioDisponivel> findDisponiveisPorEspecialidadeEPeriodo(
             Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim);
     Optional<HorarioDisponivel> findByConsultaId(ConsultaId consultaId);
+    Optional<HorarioDisponivel> findByMedicoIdAndDataHoraParaReserva(MedicoId medicoId, LocalDateTime dataHora);
 }

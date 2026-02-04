@@ -1,12 +1,15 @@
 package br.com.dgs.agendamento.application.services;
 
 import br.com.dgs.agendamento.application.dto.AgendaOutput;
+import br.com.dgs.agendamento.application.dto.AuthenticatedUser;
 import br.com.dgs.agendamento.application.dto.CriarAgendaCommand;
 import br.com.dgs.agendamento.application.dto.GerarHorariosCommand;
 import br.com.dgs.agendamento.application.ports.inbound.AgendaUseCase;
 import br.com.dgs.agendamento.application.ports.outbound.AgendaRepository;
+import br.com.dgs.agendamento.application.ports.outbound.FuncionarioService;
 import br.com.dgs.agendamento.application.ports.outbound.HorarioDisponivelRepository;
 import br.com.dgs.agendamento.domain.exception.AgendaNotFoundException;
+import br.com.dgs.agendamento.domain.exception.AuthorizationException;
 import br.com.dgs.agendamento.domain.model.*;
 
 import java.time.LocalDate;
@@ -19,16 +22,34 @@ public class AgendaUseCaseImpl implements AgendaUseCase {
 
     private final AgendaRepository agendaRepository;
     private final HorarioDisponivelRepository horarioRepository;
+    private final FuncionarioService funcionarioService;
 
     public AgendaUseCaseImpl(AgendaRepository agendaRepository,
-                             HorarioDisponivelRepository horarioRepository) {
+                             HorarioDisponivelRepository horarioRepository,
+                             FuncionarioService funcionarioService) {
         this.agendaRepository = agendaRepository;
         this.horarioRepository = horarioRepository;
+        this.funcionarioService = funcionarioService;
     }
 
     @Override
     public AgendaOutput criarAgenda(CriarAgendaCommand command) {
         MedicoId medicoId = new MedicoId(command.medicoId());
+        AuthenticatedUser user = command.currentUser();
+
+        if (user.hasRole("MEDICO")) {
+            if (!medicoId.getValue().equals(user.getId())) {
+                throw new AuthorizationException(
+                        "Médico só pode criar agenda para si mesmo. "
+                        + "Seu ID: " + user.getId() + ", medicoId informado: " + medicoId.getValue());
+            }
+        } else if (user.hasRole("ADMIN")) {
+            if (!funcionarioService.isMedico(medicoId)) {
+                throw new AuthorizationException(
+                        "O ID " + medicoId.getValue() + " não pertence a um funcionário do tipo MÉDICO.");
+            }
+        }
+
         Especialidade especialidade = new Especialidade(command.especialidade());
 
         Agenda agenda = new Agenda(
