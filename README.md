@@ -26,43 +26,43 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
 ## 1. Visao Geral da Arquitetura
 
 ```
-                          ????????????????????
-                          ?   Cliente (App)   ?
-                          ????????????????????
-                                   ? HTTP
-                                   ?
-                          ????????????????????
-                          ?   API Gateway    ?
-                          ?   (porta 8080)   ?
-                          ?                  ?
-                          ?  - Valida JWT    ?
-                          ?  - Injeta headers?
-                          ?  - Roteia        ?
-                          ????????????????????
-                                  ?
-                   ???????????????????????????????????
-                   ?              ?                   ?
-         ???????????????  ???????????????  ???????????????????
-         ? Autenticacao ?  ? Agendamento ?  ?    Triagem      ?
-         ?              ?  ?             ?  ?                 ?
-         ? - Login      ?  ? - Consultas ?  ? - Sinais vitais ?
-         ? - Cadastro   ?  ? - Agenda    ?  ? - Conduta       ?
-         ? - JWT        ?  ? - Horarios  ?  ???????????????????
-         ????????????????  ? - Exames    ?           ?
-                           ???????????????           ?
-                                  ?                  ?
-                          ????????????????????????????????
-                          ?         RabbitMQ              ?
-                          ?  Exchange: "notificacoes"     ?
-                          ????????????????????????????????
-                                  ?              ?
-                        ??????????????   ???????????????????
-                        ? Historico   ?   ?  Notificacoes   ?
-                        ?            ?   ?                 ?
-                        ? GraphQL    ?   ? Email simulado  ?
-                        ? Consultas  ?   ? Sem banco       ?
-                        ? Triagens   ?   ???????????????????
-                        ??????????????
+                          ┌──────────────────┐
+                          │   Cliente (App)   │
+                          └────────┬─────────┘
+                                   │ HTTP
+                                   ▼
+                          ┌──────────────────┐
+                          │   API Gateway    │
+                          │   (porta 8080)   │
+                          │                  │
+                          │  - Valida JWT    │
+                          │  - Injeta headers│
+                          │  - Roteia        │
+                          └───────┬──────────┘
+                                  │
+                   ┌──────────────┼──────────────────┐
+                   │              │                   │
+         ┌─────────┴───┐  ┌──────┴──────┐  ┌────────┴────────┐
+         │ Autenticacao │  │ Agendamento │  │    Triagem      │
+         │              │  │             │  │                 │
+         │ - Login      │  │ - Consultas │  │ - Sinais vitais │
+         │ - Cadastro   │  │ - Agenda    │  │ - Conduta       │
+         │ - JWT        │  │ - Horarios  │  └────────┬────────┘
+         └──────────────┘  │ - Exames    │           │
+                           └──────┬──────┘           │
+                                  │                  │
+                          ┌───────┴──────────────────┴───┐
+                          │         RabbitMQ              │
+                          │  Exchange: "notificacoes"     │
+                          └───────┬──────────────┬───────┘
+                                  │              │
+                        ┌─────────┴──┐   ┌──────┴──────────┐
+                        │ Historico   │   │  Notificacoes   │
+                        │            │   │                 │
+                        │ GraphQL    │   │ Email simulado  │
+                        │ Consultas  │   │ Sem banco       │
+                        │ Triagens   │   └─────────────────┘
+                        └────────────┘
 ```
 
 ### Microsservicos
@@ -112,27 +112,27 @@ Todos os servicos (exceto server e gateway) usam portas dinamicas (`server.port=
 
 ```
 Cliente                    Gateway                  Autenticacao
-  ?                          ?                          ?
-  ?  POST /autenticacao/     ?                          ?
-  ?       auth/login         ?                          ?
-  ?  { email, senha }        ?                          ?
-  ??????????????????????????>?                          ?
-  ?                          ?  (rota aberta, sem JWT)  ?
-  ?                          ?  POST /auth/login        ?
-  ?                          ??????????????????????????>?
-  ?                          ?                          ? Busca Paciente ou
-  ?                          ?                          ? Funcionario por email
-  ?                          ?                          ? Valida senha (BCrypt)
-  ?                          ?                          ? Gera JWT com:
-  ?                          ?                          ?  - userId
-  ?                          ?                          ?  - email
-  ?                          ?                          ?  - roles[]
-  ?                          ?  { token, type, expires, ?
-  ?                          ?    userType }            ?
-  ?                          ?<??????????????????????????
-  ?  { token, "Bearer",     ?                          ?
-  ?    86400000, "MEDICO" }  ?                          ?
-  ?<??????????????????????????                          ?
+  │                          │                          │
+  │  POST /autenticacao/     │                          │
+  │       auth/login         │                          │
+  │  { email, senha }        │                          │
+  │─────────────────────────>│                          │
+  │                          │  (rota aberta, sem JWT)  │
+  │                          │  POST /auth/login        │
+  │                          │─────────────────────────>│
+  │                          │                          │ Busca Paciente ou
+  │                          │                          │ Funcionario por email
+  │                          │                          │ Valida senha (BCrypt)
+  │                          │                          │ Gera JWT com:
+  │                          │                          │  - userId
+  │                          │                          │  - email
+  │                          │                          │  - roles[]
+  │                          │  { token, type, expires, │
+  │                          │    userType }            │
+  │                          │<─────────────────────────│
+  │  { token, "Bearer",     │                          │
+  │    86400000, "MEDICO" }  │                          │
+  │<─────────────────────────│                          │
 ```
 
 **Response de login:**
@@ -149,41 +149,41 @@ Cliente                    Gateway                  Autenticacao
 
 ```
 Cliente                    Gateway                  Microsservico
-  ?                          ?                          ?
-  ?  GET /agendamento/...    ?                          ?
-  ?  Authorization: Bearer X ?                          ?
-  ??????????????????????????>?                          ?
-  ?                          ? 1. RouterValidator:      ?
-  ?                          ?    rota eh protegida?    ?
-  ?                          ?    ("/auth/login" e      ?
-  ?                          ?    "/internal/" sao      ?
-  ?                          ?    abertas, resto nao)   ?
-  ?                          ?                          ?
-  ?                          ? 2. Extrai token do       ?
-  ?                          ?    header Authorization  ?
-  ?                          ?                          ?
-  ?                          ? 3. Valida JWT:           ?
-  ?                          ?    - Assinatura          ?
-  ?                          ?    - Expiracao           ?
-  ?                          ?                          ?
-  ?                          ? 4. Extrai claims:        ?
-  ?                          ?    - userId, email,      ?
-  ?                          ?      roles               ?
-  ?                          ?                          ?
-  ?                          ? 5. Injeta headers:       ?
-  ?                          ?    X-User-ID: 1          ?
-  ?                          ?    X-User-Email: a@b.com ?
-  ?                          ?    X-User-Roles: ROLE_X  ?
-  ?                          ?                          ?
-  ?                          ?  Requisicao + headers    ?
-  ?                          ??????????????????????????>?
-  ?                          ?                          ? SecurityFilter le
-  ?                          ?                          ? headers X-User-*
-  ?                          ?                          ? Verifica @PreAuthorize
-  ?                          ?  Response               ?
-  ?                          ?<??????????????????????????
-  ?  Response                ?                          ?
-  ?<??????????????????????????                          ?
+  │                          │                          │
+  │  GET /agendamento/...    │                          │
+  │  Authorization: Bearer X │                          │
+  │─────────────────────────>│                          │
+  │                          │ 1. RouterValidator:      │
+  │                          │    rota eh protegida?    │
+  │                          │    ("/auth/login" e      │
+  │                          │    "/internal/" sao      │
+  │                          │    abertas, resto nao)   │
+  │                          │                          │
+  │                          │ 2. Extrai token do       │
+  │                          │    header Authorization  │
+  │                          │                          │
+  │                          │ 3. Valida JWT:           │
+  │                          │    - Assinatura          │
+  │                          │    - Expiracao           │
+  │                          │                          │
+  │                          │ 4. Extrai claims:        │
+  │                          │    - userId, email,      │
+  │                          │      roles               │
+  │                          │                          │
+  │                          │ 5. Injeta headers:       │
+  │                          │    X-User-ID: 1          │
+  │                          │    X-User-Email: a@b.com │
+  │                          │    X-User-Roles: ROLE_X  │
+  │                          │                          │
+  │                          │  Requisicao + headers    │
+  │                          │─────────────────────────>│
+  │                          │                          │ SecurityFilter le
+  │                          │                          │ headers X-User-*
+  │                          │                          │ Verifica @PreAuthorize
+  │                          │  Response               │
+  │                          │<─────────────────────────│
+  │  Response                │                          │
+  │<─────────────────────────│                          │
 ```
 
 ### 3.3 Autenticacao entre Servicos (Service-to-Service)
@@ -264,36 +264,36 @@ Fluxo onde o profissional de saude (medico/enfermeiro) agenda diretamente uma co
 
 ```
 Medico/Enfermeiro             Agendamento              RabbitMQ
-  ?                              ?                        ?
-  ? POST /agendamento            ?                        ?
-  ? { pacienteId, medicoId,      ?                        ?
-  ?   dataHora, especialidade }  ?                        ?
-  ??????????????????????????????>?                        ?
-  ?                              ? 1. Valida paciente     ?
-  ?                              ?    existe (chama       ?
-  ?                              ?    autenticacao)       ?
-  ?                              ? 2. Valida medico       ?
-  ?                              ?    existe e esta ativo ?
-  ?                              ? 3. Valida dataHora     ?
-  ?                              ?    eh futura           ?
-  ?                              ? 4. Cria Consulta       ?
-  ?                              ?    status=AGENDADA     ?
-  ?                              ? 5. Salva no banco      ?
-  ?                              ?                        ?
-  ?                              ? Publica 2 eventos:     ?
-  ?                              ?????????????????????????>?
-  ?                              ? a) ConsultaDTO         ?
-  ?                              ?    routing: notificacao ?
-  ?                              ?    .agendar            ?
-  ?                              ? b) HistoricoEventDTO   ?
-  ?                              ?    tipo: AGENDADA      ?
-  ?                              ?    routing: notificacao ?
-  ?                              ?    .historico          ?
-  ?  { id, pacienteId,          ?                        ?
-  ?    medicoId, dataHora,       ?                        ?
-  ?    especialidade,            ?                        ?
-  ?    status: "AGENDADA" }      ?                        ?
-  ?<??????????????????????????????                        ?
+  │                              │                        │
+  │ POST /agendamento            │                        │
+  │ { pacienteId, medicoId,      │                        │
+  │   dataHora, especialidade }  │                        │
+  │─────────────────────────────>│                        │
+  │                              │ 1. Valida paciente     │
+  │                              │    existe (chama       │
+  │                              │    autenticacao)       │
+  │                              │ 2. Valida medico       │
+  │                              │    existe e esta ativo │
+  │                              │ 3. Valida dataHora     │
+  │                              │    eh futura           │
+  │                              │ 4. Cria Consulta       │
+  │                              │    status=AGENDADA     │
+  │                              │ 5. Salva no banco      │
+  │                              │                        │
+  │                              │ Publica 2 eventos:     │
+  │                              │────────────────────────>│
+  │                              │ a) ConsultaDTO         │
+  │                              │    routing: notificacao │
+  │                              │    .agendar            │
+  │                              │ b) HistoricoEventDTO   │
+  │                              │    tipo: AGENDADA      │
+  │                              │    routing: notificacao │
+  │                              │    .historico          │
+  │  { id, pacienteId,          │                        │
+  │    medicoId, dataHora,       │                        │
+  │    especialidade,            │                        │
+  │    status: "AGENDADA" }      │                        │
+  │<─────────────────────────────│                        │
 ```
 
 ### 5.2 Reagendar Consulta
@@ -424,43 +424,43 @@ Retorna todos os slots com `ocupado=false` para a especialidade e periodo inform
 
 ```
 Paciente                    Agendamento                    Banco
-  ?                              ?                           ?
-  ? POST /horarios/              ?                           ?
-  ?   autoagendamento            ?                           ?
-  ? { horarioDisponivelId: 1 }   ?                           ?
-  ??????????????????????????????>?                           ?
-  ?                              ? 1. SELECT FOR UPDATE      ?
-  ?                              ?    tb_horarios_disponiveis?
-  ?                              ?    WHERE id = 1           ?
-  ?                              ????????????????????????????>?
-  ?                              ?    (lock pessimista)      ?
-  ?                              ?<???????????????????????????
-  ?                              ?                           ?
-  ?                              ? 2. Verifica ocupado=false ?
-  ?                              ?                           ?
-  ?                              ? 3. Valida paciente existe ?
-  ?                              ?    (chama autenticacao)   ?
-  ?                              ?                           ?
-  ?                              ? 4. Cria Consulta:         ?
-  ?                              ?    pacienteId = userId    ?
-  ?                              ?      do token             ?
-  ?                              ?    medicoId = do slot     ?
-  ?                              ?    especialidade = do slot?
-  ?                              ?    dataHora = do slot     ?
-  ?                              ?    status = AGENDADA      ?
-  ?                              ?                           ?
-  ?                              ? 5. Marca slot:            ?
-  ?                              ?    ocupado = true         ?
-  ?                              ?    consultaId = nova ID   ?
-  ?                              ?                           ?
-  ?                              ? 6. Publica eventos        ?
-  ?                              ?    RabbitMQ               ?
-  ?                              ?                           ?
-  ?  { id, pacienteId,          ?                           ?
-  ?    medicoId, dataHora,       ?                           ?
-  ?    especialidade,            ?                           ?
-  ?    status: "AGENDADA" }      ?                           ?
-  ?<??????????????????????????????                           ?
+  │                              │                           │
+  │ POST /horarios/              │                           │
+  │   autoagendamento            │                           │
+  │ { horarioDisponivelId: 1 }   │                           │
+  │─────────────────────────────>│                           │
+  │                              │ 1. SELECT FOR UPDATE      │
+  │                              │    tb_horarios_disponiveis│
+  │                              │    WHERE id = 1           │
+  │                              │───────────────────────────>│
+  │                              │    (lock pessimista)      │
+  │                              │<──────────────────────────│
+  │                              │                           │
+  │                              │ 2. Verifica ocupado=false │
+  │                              │                           │
+  │                              │ 3. Valida paciente existe │
+  │                              │    (chama autenticacao)   │
+  │                              │                           │
+  │                              │ 4. Cria Consulta:         │
+  │                              │    pacienteId = userId    │
+  │                              │      do token             │
+  │                              │    medicoId = do slot     │
+  │                              │    especialidade = do slot│
+  │                              │    dataHora = do slot     │
+  │                              │    status = AGENDADA      │
+  │                              │                           │
+  │                              │ 5. Marca slot:            │
+  │                              │    ocupado = true         │
+  │                              │    consultaId = nova ID   │
+  │                              │                           │
+  │                              │ 6. Publica eventos        │
+  │                              │    RabbitMQ               │
+  │                              │                           │
+  │  { id, pacienteId,          │                           │
+  │    medicoId, dataHora,       │                           │
+  │    especialidade,            │                           │
+  │    status: "AGENDADA" }      │                           │
+  │<─────────────────────────────│                           │
 ```
 
 **Prevencao de double-booking:** O `SELECT FOR UPDATE` (lock pessimista) garante que dois pacientes nao conseguem reservar o mesmo slot simultaneamente. Se o slot ja estiver ocupado, o sistema retorna erro `HorarioIndisponivelException`.
@@ -521,27 +521,27 @@ Fluxo completo de exames: medico solicita, admin configura agendas, paciente age
 
 ```
 Medico                      Agendamento                  RabbitMQ
-  ?                              ?                          ?
-  ? POST /exames/solicitacoes    ?                          ?
-  ??????????????????????????????>?                          ?
-  ?                              ? 1. Valida paciente       ?
-  ?                              ? 2. Valida tipo exame     ?
-  ?                              ? 3. Cria SolicitacaoExame ?
-  ?                              ?    status = PENDENTE     ?
-  ?                              ?    prioridade = NORMAL   ?
-  ?                              ? 4. Salva                 ?
-  ?                              ?                          ?
-  ?                              ? Publica ExameEventDTO    ?
-  ?                              ? tipo: SOLICITADA         ?
-  ?                              ? routing: notificacao     ?
-  ?                              ?   .exame.solicitar       ?
-  ?                              ??????????????????????????>?
-  ?                              ?                          ?
-  ?  { id, pacienteId, medico,  ?                          ?
-  ?    tipoExame, prioridade,    ?                          ?
-  ?    status: "PENDENTE",       ?                          ?
-  ?    dataCriacao }             ?                          ?
-  ?<??????????????????????????????                          ?
+  │                              │                          │
+  │ POST /exames/solicitacoes    │                          │
+  │─────────────────────────────>│                          │
+  │                              │ 1. Valida paciente       │
+  │                              │ 2. Valida tipo exame     │
+  │                              │ 3. Cria SolicitacaoExame │
+  │                              │    status = PENDENTE     │
+  │                              │    prioridade = NORMAL   │
+  │                              │ 4. Salva                 │
+  │                              │                          │
+  │                              │ Publica ExameEventDTO    │
+  │                              │ tipo: SOLICITADA         │
+  │                              │ routing: notificacao     │
+  │                              │   .exame.solicitar       │
+  │                              │─────────────────────────>│
+  │                              │                          │
+  │  { id, pacienteId, medico,  │                          │
+  │    tipoExame, prioridade,    │                          │
+  │    status: "PENDENTE",       │                          │
+  │    dataCriacao }             │                          │
+  │<─────────────────────────────│                          │
 ```
 
 **Prioridades:** `NORMAL`, `URGENTE`
@@ -612,32 +612,32 @@ Para cada data no periodo:
 
 ```
 Paciente                    Agendamento                  RabbitMQ
-  ?                              ?                          ?
-  ? POST /exames/agendamentos    ?                          ?
-  ??????????????????????????????>?                          ?
-  ?                              ? 1. Busca SolicitacaoExame?
-  ?                              ? 2. Valida status ==      ?
-  ?                              ?    PENDENTE              ?
-  ?                              ? 3. Valida dataHora futura?
-  ?                              ? 4. Valida vagas          ?
-  ?                              ?    disponiveis no slot   ?
-  ?                              ? 5. Cria AgendamentoExame ?
-  ?                              ?    status = AGENDADO     ?
-  ?                              ? 6. Atualiza solicitacao: ?
-  ?                              ?    status = AGENDADA     ?
-  ?                              ? 7. Salva ambos           ?
-  ?                              ?                          ?
-  ?                              ? Publica ExameEventDTO    ?
-  ?                              ? tipo: AGENDADA           ?
-  ?                              ? routing: notificacao     ?
-  ?                              ?   .exame.agendar         ?
-  ?                              ??????????????????????????>?
-  ?                              ?                          ?
-  ?  { id, solicitacaoExameId,  ?                          ?
-  ?    dataHora,                 ?                          ?
-  ?    status: "AGENDADO",       ?                          ?
-  ?    dataCriacao }             ?                          ?
-  ?<??????????????????????????????                          ?
+  │                              │                          │
+  │ POST /exames/agendamentos    │                          │
+  │─────────────────────────────>│                          │
+  │                              │ 1. Busca SolicitacaoExame│
+  │                              │ 2. Valida status ==      │
+  │                              │    PENDENTE              │
+  │                              │ 3. Valida dataHora futura│
+  │                              │ 4. Valida vagas          │
+  │                              │    disponiveis no slot   │
+  │                              │ 5. Cria AgendamentoExame │
+  │                              │    status = AGENDADO     │
+  │                              │ 6. Atualiza solicitacao: │
+  │                              │    status = AGENDADA     │
+  │                              │ 7. Salva ambos           │
+  │                              │                          │
+  │                              │ Publica ExameEventDTO    │
+  │                              │ tipo: AGENDADA           │
+  │                              │ routing: notificacao     │
+  │                              │   .exame.agendar         │
+  │                              │─────────────────────────>│
+  │                              │                          │
+  │  { id, solicitacaoExameId,  │                          │
+  │    dataHora,                 │                          │
+  │    status: "AGENDADO",       │                          │
+  │    dataCriacao }             │                          │
+  │<─────────────────────────────│                          │
 ```
 
 ### 7.6 Cancelar Agendamento de Exame
@@ -724,7 +724,7 @@ type HistoricoConsulta {
 O historico **nunca eh chamado diretamente** pelo agendamento. Os dados chegam exclusivamente via RabbitMQ:
 
 ```
-Agendamento ??publish??> RabbitMQ ??consume??> Historico
+Agendamento ──publish──> RabbitMQ ──consume──> Historico
 ```
 
 | Evento | Acao no Historico |
@@ -761,18 +761,18 @@ Em producao, esses logs seriam substituidos por chamadas reais a servicos de ema
 
 ```
 Exchange: "notificacoes" (Topic Exchange)
-?
-??? Routing: notificacao.agendar     ??> Queue: notificacao.agendar.queue     ??> Notificacoes
-??? Routing: notificacao.cancelar    ??> Queue: notificacao.cancelar.queue    ??> Notificacoes
-??? Routing: notificacao.reagendar   ??> Queue: notificacao.reagendar.queue   ??> Notificacoes
-??? Routing: notificacao.historico   ??> Queue: notificacao.historico.queue   ??> Historico
-?
-??? Routing: notificacao.exame.solicitar ??> Queue: notificacao.exame.queue   ??> Notificacoes
-??? Routing: notificacao.exame.agendar   ??> Queue: notificacao.exame.agendar ??> Notificacoes
-??? Routing: notificacao.exame.cancelar  ??> Queue: notificacao.exame.cancelar??> Notificacoes
-?
-??? Routing: triagem.atendimento    ??> Queue: triagem.atendimento.queue     ??> (consumidor futuro)
-??? Routing: triagem.historico      ??> Queue: triagem.historico.queue       ??> Historico
+│
+├── Routing: notificacao.agendar     ──> Queue: notificacao.agendar.queue     ──> Notificacoes
+├── Routing: notificacao.cancelar    ──> Queue: notificacao.cancelar.queue    ──> Notificacoes
+├── Routing: notificacao.reagendar   ──> Queue: notificacao.reagendar.queue   ──> Notificacoes
+├── Routing: notificacao.historico   ──> Queue: notificacao.historico.queue   ──> Historico
+│
+├── Routing: notificacao.exame.solicitar ──> Queue: notificacao.exame.queue   ──> Notificacoes
+├── Routing: notificacao.exame.agendar   ──> Queue: notificacao.exame.agendar ──> Notificacoes
+├── Routing: notificacao.exame.cancelar  ──> Queue: notificacao.exame.cancelar──> Notificacoes
+│
+├── Routing: triagem.atendimento    ──> Queue: triagem.atendimento.queue     ──> (consumidor futuro)
+└── Routing: triagem.historico      ──> Queue: triagem.historico.queue       ──> Historico
 ```
 
 ### DTOs de Mensagem
@@ -926,9 +926,9 @@ Cada microsservico segue rigorosamente:
 
 ```
 domain/         Entidades, value objects, excecoes - Java puro, ZERO imports de framework
-     ?
+     │
 application/    Use cases, ports, DTOs - depende apenas do domain
-     ?
+     │
 infrastructure/ Controllers, JPA, security, config - depende de domain + application
 ```
 
