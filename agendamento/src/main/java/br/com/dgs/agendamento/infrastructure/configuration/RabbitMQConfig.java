@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-
     @Bean
     public TopicExchange notificacoesExchange() {
         return new TopicExchange(RabbitConfig.EXCHANGE_NAME);
@@ -37,7 +36,6 @@ public class RabbitMQConfig {
         return new Queue(RabbitConfig.QUEUE_HISTORICO, true);
     }
 
-
     @Bean
     public Binding bindingAgendar(Queue agendarQueue, TopicExchange notificacoesExchange) {
         return BindingBuilder.bind(agendarQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_AGENDAR);
@@ -56,39 +54,5 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingHistorico(Queue reagendarQueue, TopicExchange notificacoesExchange) {
         return BindingBuilder.bind(reagendarQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_HISTORICO);
-    }
-
-    @Bean
-    public Queue exameSolicitarQueue() {
-        return new Queue(RabbitConfig.QUEUE_EXAME_SOLICITAR, true);
-    }
-
-    @Bean
-    public Queue exameAgendarQueue() {
-        return new Queue(RabbitConfig.QUEUE_EXAME_AGENDAR, true);
-    }
-
-    @Bean
-    public Queue exameCancelarQueue() {
-        return new Queue(RabbitConfig.QUEUE_EXAME_CANCELAR, true);
-    }
-
-    // Exame bindings
-    @Bean
-    public Binding bindingExameSolicitar(Queue exameSolicitarQueue, TopicExchange notificacoesExchange) {
-        return BindingBuilder.bind(exameSolicitarQueue).to(notificacoesExchange)
-                .with(RabbitConfig.ROUTING_KEY_EXAME_SOLICITAR);
-    }
-
-    @Bean
-    public Binding bindingExameAgendar(Queue exameAgendarQueue, TopicExchange notificacoesExchange) {
-        return BindingBuilder.bind(exameAgendarQueue).to(notificacoesExchange)
-                .with(RabbitConfig.ROUTING_KEY_EXAME_AGENDAR);
-    }
-
-    @Bean
-    public Binding bindingExameCancelar(Queue exameCancelarQueue, TopicExchange notificacoesExchange) {
-        return BindingBuilder.bind(exameCancelarQueue).to(notificacoesExchange)
-                .with(RabbitConfig.ROUTING_KEY_EXAME_CANCELAR);
     }
 }

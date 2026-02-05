@@ -1,5 +1,6 @@
 package br.com.dgs.agendamento.infrastructure.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,6 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -21,9 +25,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/internal/**").hasRole("SISTEMA")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new UserRoleAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new UserRoleAuthenticationFilter(jwtSecret), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

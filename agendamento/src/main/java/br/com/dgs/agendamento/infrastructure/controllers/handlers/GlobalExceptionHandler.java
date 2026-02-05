@@ -74,28 +74,4 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-
-    @ExceptionHandler(ExameBusinessException.class)
-    public ResponseEntity<Map<String, String>> handleExameBusinessException(ExameBusinessException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "Regra de Negócio de Exame Violada", "message", ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-        );
-    }
-
-    @ExceptionHandler(SolicitacaoExameNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleSolicitacaoExameNotFoundException(SolicitacaoExameNotFoundException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "Solicitação de Exame Não Encontrada", "message", ex.getMessage()),
-                HttpStatus.NOT_FOUND
-        );
-    }
-
-    @ExceptionHandler(VagaExameIndisponivelException.class)
-    public ResponseEntity<Map<String, String>> handleVagaExameIndisponivelException(VagaExameIndisponivelException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "Vaga de Exame Indisponível", "message", ex.getMessage()),
-                HttpStatus.CONFLICT
-        );
-    }
 }

@@ -103,6 +103,30 @@ public class HistoricoUseCaseImpl implements HistoricoUseCase {
         return mapToOutput(historico);
     }
 
+    @Override
+    public HistoricoOutput registrarAtendimentoFinalizado(RegistrarAtendimentoFinalizadoCommand command) {
+        ConsultaId consultaId = new ConsultaId(command.consultaId());
+
+        HistoricoConsulta historico = historicoRepository.findByConsultaId(consultaId)
+                .orElseThrow(() -> new HistoricoNotFoundException(
+                        "Histórico não encontrado para consulta ID: " + command.consultaId()
+                ));
+
+        String observacoes = String.format(
+                "Atendimento ID: %d | Anamnese: %s | Conduta: %s | Início: %s | Fim: %s",
+                command.atendimentoId(),
+                command.anamnese(),
+                command.condutaMedica(),
+                command.dataHoraInicio(),
+                command.dataHoraFim()
+        );
+
+        historico.marcarComoRealizada(observacoes);
+        HistoricoConsulta historicoAtualizado = historicoRepository.save(historico);
+
+        return mapToOutput(historicoAtualizado);
+    }
+
     private HistoricoOutput mapToOutput(HistoricoConsulta historico) {
         return new HistoricoOutput(
                 historico.getId().getValue(),
