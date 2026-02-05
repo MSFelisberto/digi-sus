@@ -27,11 +27,9 @@ public class AtendimentoEntity {
     @Column(name = "medico_id", nullable = false)
     private Long medicoId;
 
-    @Lob
     @Column(name = "anamnese", columnDefinition = "TEXT")
     private String anamnese;
 
-    @Lob
     @Column(name = "conduta_medica", columnDefinition = "TEXT")
     private String condutaMedica;
 

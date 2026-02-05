@@ -21,7 +21,11 @@ public class ServiceAuthenticationService {
             @Value("${services.credentials.historico.id:historico-service}") String historicoId,
             @Value("${services.credentials.historico.secret:}") String historicoSecret,
             @Value("${services.credentials.notificacoes.id:notificacoes-service}") String notificacoesId,
-            @Value("${services.credentials.notificacoes.secret:}") String notificacoesSecret) {
+            @Value("${services.credentials.notificacoes.secret:}") String notificacoesSecret,
+            @Value("${services.credentials.atendimento.id:atendimento-service}") String atendimentoId,
+            @Value("${services.credentials.atendimento.secret:}") String atendimentoSecret,
+            @Value("${services.credentials.exames.id:exames-service}") String examesId,
+            @Value("${services.credentials.exames.secret:}") String examesSecret) {
 
         this.tokenService = tokenService;
 
@@ -29,11 +33,15 @@ public class ServiceAuthenticationService {
         log.info("Agendamento ID: {}", agendamentoId);
         log.info("Historico ID: {}", historicoId);
         log.info("Notificacoes ID: {}", notificacoesId);
+        log.info("Atendimento ID: {}", atendimentoId);
+        log.info("Exames ID: {}", examesId);
 
-        this.serviceCredentials = Map.of(
-                agendamentoId, agendamentoSecret,
-                historicoId, historicoSecret,
-                notificacoesId, notificacoesSecret
+        this.serviceCredentials = Map.ofEntries(
+                Map.entry(agendamentoId, agendamentoSecret),
+                Map.entry(historicoId, historicoSecret),
+                Map.entry(notificacoesId, notificacoesSecret),
+                Map.entry(atendimentoId, atendimentoSecret),
+                Map.entry(examesId, examesSecret)
         );
     }
 
