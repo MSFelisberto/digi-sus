@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/internal/**").hasRole("SISTEMA")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new UserRoleAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

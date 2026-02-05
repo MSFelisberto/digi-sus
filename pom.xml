@@ -17,6 +17,8 @@
         <module>autenticacao</module>
         <module>server</module>
         <module>triagem</module>
+        <module>atendimento</module>
+        <module>exames</module>
     </modules>
 
     <properties>

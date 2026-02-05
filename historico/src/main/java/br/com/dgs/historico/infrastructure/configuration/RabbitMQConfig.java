@@ -39,4 +39,17 @@ public class RabbitMQConfig {
                 .to(notificacoesExchange)
                 .with(RabbitConfig.ROUTING_KEY_TRIAGEM_HISTORICO);
     }
+
+    // Atendimento Finalizado
+    @Bean
+    public Queue atendimentoFinalizadoQueue() {
+        return new Queue(RabbitConfig.QUEUE_ATENDIMENTO_FINALIZADO, true);
+    }
+
+    @Bean
+    public Binding bindingAtendimentoFinalizado(Queue atendimentoFinalizadoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(atendimentoFinalizadoQueue)
+                .to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_ATENDIMENTO_FINALIZADO);
+    }
 }

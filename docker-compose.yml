@@ -76,6 +76,8 @@ services:
       - AGENDAMENTO_SECRET=${AGENDAMENTO_SECRET}
       - HISTORICO_SECRET=${HISTORICO_SECRET}
       - NOTIFICACOES_SECRET=${NOTIFICACOES_SECRET}
+      - ATENDIMENTO_SECRET=${ATENDIMENTO_SECRET}
+      - EXAMES_SECRET=${EXAMES_SECRET}
     networks:
       - dgs-network
 
@@ -144,6 +146,42 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TRIAGEM_SECRET=${TRIAGEM_SECRET}
+    networks:
+      - dgs-network
+
+  atendimento:
+    build:
+      context: .
+      dockerfile: atendimento/Dockerfile
+    container_name: ms-atendimento
+    depends_on:
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - ATENDIMENTO_SECRET=${ATENDIMENTO_SECRET}
+    networks:
+      - dgs-network
+
+  exames:
+    build:
+      context: .
+      dockerfile: exames/Dockerfile
+    container_name: ms-exames
+    depends_on:
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EXAMES_SECRET=${EXAMES_SECRET}
     networks:
       - dgs-network
 

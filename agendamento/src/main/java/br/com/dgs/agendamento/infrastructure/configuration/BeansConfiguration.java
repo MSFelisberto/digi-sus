@@ -47,41 +47,4 @@ public class BeansConfiguration {
                 notificationService
         );
     }
-
-    @Bean
-    public TipoExameUseCase tipoExameUseCase(TipoExameRepository tipoExameRepository) {
-        return new TipoExameUseCaseImpl(tipoExameRepository);
-    }
-
-    @Bean
-    public SolicitacaoExameUseCase solicitacaoExameUseCase(
-            SolicitacaoExameRepository solicitacaoExameRepository,
-            TipoExameRepository tipoExameRepository,
-            PacienteService pacienteService,
-            ExameNotificationService exameNotificationService) {
-
-        return new SolicitacaoExameUseCaseImpl(
-                solicitacaoExameRepository,
-                tipoExameRepository,
-                pacienteService,
-                exameNotificationService
-        );
-    }
-
-    @Bean
-    public AgendamentoExameUseCase agendamentoExameUseCase(
-            AgendamentoExameRepository agendamentoExameRepository,
-            SolicitacaoExameRepository solicitacaoExameRepository,
-            AgendaExameRepository agendaExameRepository,
-            TipoExameRepository tipoExameRepository,
-            ExameNotificationService exameNotificationService) {
-
-        return new AgendamentoExameUseCaseImpl(
-                agendamentoExameRepository,
-                solicitacaoExameRepository,
-                agendaExameRepository,
-                tipoExameRepository,
-                exameNotificationService
-        );
-    }
 }

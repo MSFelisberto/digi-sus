@@ -70,6 +70,16 @@ public class Consulta {
         this.status = StatusConsulta.CANCELADA;
     }
 
+    public void marcarComoRealizada() {
+        if (status == StatusConsulta.CANCELADA) {
+            throw new ConsultaBusinessException("Não é possível marcar como realizada uma consulta cancelada");
+        }
+        if (status == StatusConsulta.REALIZADA) {
+            throw new ConsultaBusinessException("Consulta já está marcada como realizada");
+        }
+        this.status = StatusConsulta.REALIZADA;
+    }
+
 
     private void validarDadosObrigatorios(PacienteId pacienteId,
                                           MedicoId medicoId,

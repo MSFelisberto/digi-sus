@@ -10,4 +10,5 @@ public interface HistoricoUseCase {
     void cancelarHistorico(CancelarHistoricoCommand command);
     List<HistoricoOutput> listarHistoricoPorPaciente(ListarHistoricoQuery query);
     HistoricoOutput buscarPorConsultaId(Long consultaId);
+    HistoricoOutput registrarAtendimentoFinalizado(RegistrarAtendimentoFinalizadoCommand command);
 }
