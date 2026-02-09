@@ -82,7 +82,10 @@ public class HorarioDisponivelController {
                 output.medicoId(),
                 output.dataHora(),
                 output.especialidade(),
-                output.status()
+                output.status(),
+                output.tipoConsulta(),
+                output.prioridade(),
+                output.triagemId()
         );
 
         URI uri = URI.create("/agendamento/" + response.id());

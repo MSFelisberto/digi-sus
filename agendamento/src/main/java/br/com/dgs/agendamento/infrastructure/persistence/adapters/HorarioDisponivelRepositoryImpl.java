@@ -73,6 +73,23 @@ public class HorarioDisponivelRepositoryImpl implements HorarioDisponivelReposit
                 .map(this::toDomain);
     }
 
+    @Override
+    @Transactional
+    public Optional<HorarioDisponivel> findPrimeiroDisponivelPorEspecialidadeHoje(
+            Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim) {
+        return jpaRepository.findPrimeiroDisponivelPorEspecialidadeForUpdate(
+                        especialidade.getValue(), inicio, fim)
+                .map(this::toDomain);
+    }
+
+    @Override
+    public Optional<MedicoId> findMedicoIdPorEspecialidadeEData(
+            Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim) {
+        return jpaRepository.findPrimeiroMedicoIdPorEspecialidadeEData(
+                        especialidade.getValue(), inicio, fim)
+                .map(MedicoId::new);
+    }
+
     private HorarioDisponivelEntity toEntity(HorarioDisponivel horario) {
         HorarioDisponivelEntity entity = new HorarioDisponivelEntity();
         if (horario.getId() != null) {

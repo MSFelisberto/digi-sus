@@ -6,6 +6,7 @@ public record RealizarTriagemCommand(
         String pressaoArterial,
         Double temperatura,
         Integer batimentoCardiaco,
-        String conduta
+        String conduta,
+        String especialidade
 ) {
 }

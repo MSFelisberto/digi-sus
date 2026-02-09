@@ -19,4 +19,7 @@ public class ConsultaEntity {
     private LocalDateTime dataHora;
     private String especialidade;
     private boolean cancelada;
+    private String tipoConsulta;
+    private String prioridade;
+    private Long triagemId;
 }

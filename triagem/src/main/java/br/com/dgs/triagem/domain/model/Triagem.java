@@ -12,15 +12,21 @@ public class Triagem {
     private Double temperatura;
     private Integer batimentoCardiaco;
     private String conduta;
+    private String especialidade;
+    private Prioridade prioridade;
 
     public Triagem(PacienteId pacienteId,
                    FuncionarioId funcionarioId,
                    String pressaoArterial,
                    Double temperatura,
                    Integer batimentoCardiaco,
-                   String conduta) {
+                   String conduta,
+                   String especialidade) {
         validarDadosObrigatorios(pacienteId, funcionarioId, pressaoArterial, temperatura, batimentoCardiaco, conduta);
         validarDadosClinicos(temperatura, batimentoCardiaco);
+        if (especialidade == null || especialidade.trim().isEmpty()) {
+            throw new TriagemBusinessException("Especialidade é obrigatória");
+        }
 
         this.id = TriagemId.generate();
         this.pacienteId = pacienteId;
@@ -29,6 +35,21 @@ public class Triagem {
         this.temperatura = temperatura;
         this.batimentoCardiaco = batimentoCardiaco;
         this.conduta = conduta;
+        this.especialidade = especialidade.trim().toUpperCase();
+        this.prioridade = classificarPrioridade(temperatura, batimentoCardiaco);
+    }
+
+    private Prioridade classificarPrioridade(Double temperatura, Integer batimentoCardiaco) {
+        if (temperatura >= 40 || temperatura <= 34 || batimentoCardiaco >= 150 || batimentoCardiaco <= 40) {
+            return Prioridade.EMERGENCIA;
+        }
+        if (temperatura >= 39 || temperatura <= 35 || batimentoCardiaco >= 120 || batimentoCardiaco <= 50) {
+            return Prioridade.URGENTE;
+        }
+        if (temperatura >= 38 || batimentoCardiaco >= 100 || batimentoCardiaco <= 55) {
+            return Prioridade.POUCO_URGENTE;
+        }
+        return Prioridade.NAO_URGENTE;
     }
 
     private void validarDadosObrigatorios(PacienteId pacienteId,
@@ -78,6 +99,8 @@ public class Triagem {
     public Double getTemperatura() { return temperatura; }
     public Integer getBatimentoCardiaco() { return batimentoCardiaco; }
     public String getConduta() { return conduta; }
+    public String getEspecialidade() { return especialidade; }
+    public Prioridade getPrioridade() { return prioridade; }
 
     @Override
     public boolean equals(Object o) {

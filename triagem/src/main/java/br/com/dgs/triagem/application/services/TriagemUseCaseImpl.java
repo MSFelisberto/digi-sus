@@ -44,7 +44,8 @@ public class TriagemUseCaseImpl implements TriagemUseCase {
                 command.pressaoArterial(),
                 command.temperatura(),
                 command.batimentoCardiaco(),
-                command.conduta()
+                command.conduta(),
+                command.especialidade()
         );
 
         messagingService.enviarParaAtendimento(triagem);
@@ -60,6 +61,8 @@ public class TriagemUseCaseImpl implements TriagemUseCase {
                 triagem.getTemperatura(),
                 triagem.getBatimentoCardiaco(),
                 triagem.getConduta(),
+                triagem.getEspecialidade(),
+                triagem.getPrioridade().name(),
                 "Triagem realizada com sucesso"
         );
     }

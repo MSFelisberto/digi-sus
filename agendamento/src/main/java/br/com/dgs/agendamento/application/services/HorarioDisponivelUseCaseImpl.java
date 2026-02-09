@@ -93,7 +93,10 @@ public class HorarioDisponivelUseCaseImpl implements HorarioDisponivelUseCase {
                 consultaSalva.getMedicoId().getValue(),
                 consultaSalva.getDataHora(),
                 consultaSalva.getEspecialidade().getValue(),
-                consultaSalva.getStatus().name()
+                consultaSalva.getStatus().name(),
+                consultaSalva.getTipoConsulta() != null ? consultaSalva.getTipoConsulta().name() : null,
+                consultaSalva.getPrioridade() != null ? consultaSalva.getPrioridade().name() : null,
+                consultaSalva.getTriagemId()
         );
     }
 

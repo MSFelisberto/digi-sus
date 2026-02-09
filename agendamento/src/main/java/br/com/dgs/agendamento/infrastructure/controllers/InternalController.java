@@ -35,7 +35,10 @@ public class InternalController {
                 output.medicoId(),
                 output.dataHora(),
                 output.especialidade(),
-                output.status()
+                output.status(),
+                output.tipoConsulta(),
+                output.prioridade(),
+                output.triagemId()
         );
     }
 }

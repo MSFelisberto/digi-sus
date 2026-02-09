@@ -15,4 +15,5 @@ public interface ConsultaRepository {
     List<Consulta> findFuturasByPacienteId(PacienteId pacienteId);
     List<Consulta> findFuturasByMedicoId(MedicoId medicoId);
     List<Consulta> findAllFuturas();
+    Optional<Consulta> findByTriagemId(Long triagemId);
 }

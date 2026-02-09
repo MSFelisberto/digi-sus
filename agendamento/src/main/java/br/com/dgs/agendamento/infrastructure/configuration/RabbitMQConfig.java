@@ -55,4 +55,14 @@ public class RabbitMQConfig {
     public Binding bindingHistorico(Queue reagendarQueue, TopicExchange notificacoesExchange) {
         return BindingBuilder.bind(reagendarQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_HISTORICO);
     }
+
+    @Bean
+    public Queue triagemAtendimentoQueue() {
+        return new Queue(RabbitConfig.QUEUE_TRIAGEM_ATENDIMENTO, true);
+    }
+
+    @Bean
+    public Binding bindingTriagemAtendimento(Queue triagemAtendimentoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(triagemAtendimentoQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_TRIAGEM_ATENDIMENTO);
+    }
 }

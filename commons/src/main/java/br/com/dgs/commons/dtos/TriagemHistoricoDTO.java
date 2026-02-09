@@ -22,6 +22,12 @@ public record TriagemHistoricoDTO(
         Integer batimentoCardiaco,
 
         @NotNull
-        String conduta
+        String conduta,
+
+        @NotNull
+        String especialidade,
+
+        @NotNull
+        String prioridade
 ) {
 }

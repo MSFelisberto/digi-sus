@@ -8,5 +8,8 @@ public record ConsultaOutput(
         Long medicoId,
         LocalDateTime dataHora,
         String especialidade,
-        String status
+        String status,
+        String tipoConsulta,
+        String prioridade,
+        Long triagemId
 ) {}

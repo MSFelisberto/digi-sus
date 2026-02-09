@@ -47,7 +47,8 @@ public class TriagemController {
                 request.pressaoArterial(),
                 request.temperatura(),
                 request.batimentoCardiaco(),
-                request.conduta()
+                request.conduta(),
+                request.especialidade()
         );
 
         TriagemOutput output = triagemUseCase.realizarTriagem(command, user);
@@ -60,6 +61,8 @@ public class TriagemController {
                 output.temperatura(),
                 output.batimentoCardiaco(),
                 output.conduta(),
+                output.especialidade(),
+                output.prioridade(),
                 output.mensagem()
         );
 

@@ -27,7 +27,9 @@ public class TriagemMessagingServiceImpl implements TriagemMessagingService {
                 triagem.getPacienteId().getValue(),
                 triagemIdNumerico,
                 triagem.getDadosClinicos(),
-                triagem.getConduta()
+                triagem.getConduta(),
+                triagem.getEspecialidade(),
+                triagem.getPrioridade().name()
         );
 
         rabbitTemplate.convertAndSend(
@@ -50,7 +52,9 @@ public class TriagemMessagingServiceImpl implements TriagemMessagingService {
                 triagem.getPressaoArterial(),
                 triagem.getTemperatura(),
                 triagem.getBatimentoCardiaco(),
-                triagem.getConduta()
+                triagem.getConduta(),
+                triagem.getEspecialidade(),
+                triagem.getPrioridade().name()
         );
 
         rabbitTemplate.convertAndSend(

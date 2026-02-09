@@ -13,6 +13,12 @@ public record TriagemAtendimentoDTO(
         String dadosClinicos,
 
         @NotNull
-        String conduta
+        String conduta,
+
+        @NotNull
+        String especialidade,
+
+        @NotNull
+        String prioridade
 ) {
 }

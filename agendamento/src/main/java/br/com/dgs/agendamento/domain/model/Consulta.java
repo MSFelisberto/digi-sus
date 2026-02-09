@@ -12,6 +12,9 @@ public class Consulta {
     private LocalDateTime dataHora;
     private Especialidade especialidade;
     private StatusConsulta status;
+    private TipoConsulta tipoConsulta;
+    private Prioridade prioridade;
+    private Long triagemId;
 
     public Consulta(PacienteId pacienteId,
                     MedicoId medicoId,
@@ -26,6 +29,9 @@ public class Consulta {
         this.dataHora = dataHora;
         this.especialidade = especialidade;
         this.status = StatusConsulta.AGENDADA;
+        this.tipoConsulta = TipoConsulta.REGULAR;
+        this.prioridade = null;
+        this.triagemId = null;
     }
 
     public Consulta(ConsultaId id,
@@ -33,7 +39,10 @@ public class Consulta {
                     MedicoId medicoId,
                     LocalDateTime dataHora,
                     Especialidade especialidade,
-                    StatusConsulta status)
+                    StatusConsulta status,
+                    TipoConsulta tipoConsulta,
+                    Prioridade prioridade,
+                    Long triagemId)
     {
         this.id = id;
         this.pacienteId = pacienteId;
@@ -41,7 +50,34 @@ public class Consulta {
         this.dataHora = dataHora;
         this.especialidade = especialidade;
         this.status = status;
+        this.tipoConsulta = tipoConsulta != null ? tipoConsulta : TipoConsulta.REGULAR;
+        this.prioridade = prioridade;
+        this.triagemId = triagemId;
     }
+
+    public static Consulta criarConsultaTriagem(PacienteId pacienteId,
+                                                 MedicoId medicoId,
+                                                 LocalDateTime dataHora,
+                                                 Especialidade especialidade,
+                                                 TipoConsulta tipoConsulta,
+                                                 Prioridade prioridade,
+                                                 Long triagemId)
+    {
+        validarDadosObrigatoriosStatic(pacienteId, medicoId, dataHora, especialidade);
+
+        Consulta consulta = new Consulta();
+        consulta.pacienteId = pacienteId;
+        consulta.medicoId = medicoId;
+        consulta.dataHora = dataHora;
+        consulta.especialidade = especialidade;
+        consulta.status = StatusConsulta.AGENDADA;
+        consulta.tipoConsulta = tipoConsulta;
+        consulta.prioridade = prioridade;
+        consulta.triagemId = triagemId;
+        return consulta;
+    }
+
+    private Consulta() {}
 
     public void reagendar(LocalDateTime novaDataHora,
                           MedicoId novoMedico,
@@ -63,7 +99,7 @@ public class Consulta {
             throw new ConsultaBusinessException("Consulta já está cancelada");
         }
 
-        if (dataHora.isBefore(LocalDateTime.now().plusHours(24))) {
+        if (tipoConsulta != TipoConsulta.ENCAIXE && dataHora.isBefore(LocalDateTime.now().plusHours(24))) {
             throw new ConsultaBusinessException("Não é possível cancelar consulta com menos de 24h de antecedência");
         }
 
@@ -85,6 +121,14 @@ public class Consulta {
                                           MedicoId medicoId,
                                           LocalDateTime dataHora,
                                           Especialidade especialidade)
+    {
+        validarDadosObrigatoriosStatic(pacienteId, medicoId, dataHora, especialidade);
+    }
+
+    private static void validarDadosObrigatoriosStatic(PacienteId pacienteId,
+                                                        MedicoId medicoId,
+                                                        LocalDateTime dataHora,
+                                                        Especialidade especialidade)
     {
         if (pacienteId == null) {
             throw new ConsultaBusinessException("Paciente é obrigatório");
@@ -112,6 +156,9 @@ public class Consulta {
     public LocalDateTime getDataHora() { return dataHora; }
     public Especialidade getEspecialidade() { return especialidade; }
     public StatusConsulta getStatus() { return status; }
+    public TipoConsulta getTipoConsulta() { return tipoConsulta; }
+    public Prioridade getPrioridade() { return prioridade; }
+    public Long getTriagemId() { return triagemId; }
 
     public void setId(ConsultaId id) { this.id = id; }
 

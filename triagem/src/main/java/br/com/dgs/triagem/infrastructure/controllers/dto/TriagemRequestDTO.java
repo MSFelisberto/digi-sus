@@ -25,6 +25,9 @@ public record TriagemRequestDTO(
         Integer batimentoCardiaco,
 
         @NotBlank(message = "Conduta é obrigatória")
-        String conduta
+        String conduta,
+
+        @NotBlank(message = "Especialidade é obrigatória")
+        String especialidade
 ) {
 }

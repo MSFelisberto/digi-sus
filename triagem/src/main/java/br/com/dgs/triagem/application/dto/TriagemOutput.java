@@ -8,6 +8,8 @@ public record TriagemOutput(
         Double temperatura,
         Integer batimentoCardiaco,
         String conduta,
+        String especialidade,
+        String prioridade,
         String mensagem
 ) {
 }

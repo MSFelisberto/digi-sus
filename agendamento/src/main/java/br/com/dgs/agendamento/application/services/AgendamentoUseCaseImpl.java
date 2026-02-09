@@ -200,7 +200,10 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
                 consulta.getMedicoId().getValue(),
                 consulta.getDataHora(),
                 consulta.getEspecialidade().getValue(),
-                consulta.getStatus().name()
+                consulta.getStatus().name(),
+                consulta.getTipoConsulta() != null ? consulta.getTipoConsulta().name() : null,
+                consulta.getPrioridade() != null ? consulta.getPrioridade().name() : null,
+                consulta.getTriagemId()
         );
     }
 }

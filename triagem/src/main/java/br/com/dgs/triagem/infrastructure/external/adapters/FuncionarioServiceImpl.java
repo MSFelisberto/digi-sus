@@ -36,16 +36,16 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         try {
             String serviceToken = authenticationService.getServiceToken();
 
-            String url = funcionarioServiceUrl + "/funcionarios/" + funcionarioId;
+            String url = funcionarioServiceUrl + "/internal/usuarios/funcionarios/" + funcionarioId + "/exists";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(serviceToken);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    url, HttpMethod.GET, entity, Map.class);
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                    url, HttpMethod.GET, entity, Boolean.class);
 
-            return response.getStatusCode().is2xxSuccessful();
+            return Boolean.TRUE.equals(response.getBody());
 
         } catch (HttpClientErrorException e) {
             log.warn("Funcionário com ID {} não encontrado: {}", funcionarioId, e.getMessage());
@@ -61,21 +61,16 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         try {
             String serviceToken = authenticationService.getServiceToken();
 
-            String url = funcionarioServiceUrl + "/funcionarios/" + funcionarioId;
+            String url = funcionarioServiceUrl + "/internal/usuarios/funcionarios/" + funcionarioId + "/is-enfermeiro";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(serviceToken);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    url, HttpMethod.GET, entity, Map.class);
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                    url, HttpMethod.GET, entity, Boolean.class);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                String tipo = (String) response.getBody().get("tipo");
-                return "ENFERMEIRO".equals(tipo);
-            }
-
-            return false;
+            return Boolean.TRUE.equals(response.getBody());
 
         } catch (Exception e) {
             log.error("Erro ao verificar tipo do funcionário {}: {}", funcionarioId, e.getMessage());

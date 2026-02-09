@@ -33,12 +33,34 @@ public class InternalController {
         return ResponseEntity.ok(exists);
     }
 
+    @GetMapping("/usuarios/funcionarios/{funcionarioId}/exists")
+    @PreAuthorize("hasRole('SISTEMA')")
+    public ResponseEntity<Boolean> existeFuncionario(@PathVariable Long funcionarioId) {
+        try {
+            funcionarioUseCase.buscarPorId(funcionarioId);
+            return ResponseEntity.ok(true);
+        } catch (Exception e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+
     @GetMapping("/usuarios/funcionarios/{funcionarioId}/is-medico")
     @PreAuthorize("hasRole('SISTEMA')")
     public ResponseEntity<Boolean> isMedico(@PathVariable Long funcionarioId) {
         try {
             FuncionarioOutput funcionario = funcionarioUseCase.buscarPorId(funcionarioId);
             return ResponseEntity.ok(funcionario.tipo() == TipoFuncionario.MEDICO);
+        } catch (Exception e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+
+    @GetMapping("/usuarios/funcionarios/{funcionarioId}/is-enfermeiro")
+    @PreAuthorize("hasRole('SISTEMA')")
+    public ResponseEntity<Boolean> isEnfermeiro(@PathVariable Long funcionarioId) {
+        try {
+            FuncionarioOutput funcionario = funcionarioUseCase.buscarPorId(funcionarioId);
+            return ResponseEntity.ok(funcionario.tipo() == TipoFuncionario.ENFERMEIRO);
         } catch (Exception e) {
             return ResponseEntity.ok(false);
         }

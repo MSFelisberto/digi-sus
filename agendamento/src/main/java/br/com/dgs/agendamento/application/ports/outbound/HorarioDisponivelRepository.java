@@ -19,4 +19,8 @@ public interface HorarioDisponivelRepository {
             Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim);
     Optional<HorarioDisponivel> findByConsultaId(ConsultaId consultaId);
     Optional<HorarioDisponivel> findByMedicoIdAndDataHoraParaReserva(MedicoId medicoId, LocalDateTime dataHora);
+    Optional<HorarioDisponivel> findPrimeiroDisponivelPorEspecialidadeHoje(
+            Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim);
+    Optional<MedicoId> findMedicoIdPorEspecialidadeEData(
+            Especialidade especialidade, LocalDateTime inicio, LocalDateTime fim);
 }

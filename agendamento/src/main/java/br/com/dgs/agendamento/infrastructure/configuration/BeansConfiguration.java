@@ -47,4 +47,17 @@ public class BeansConfiguration {
                 notificationService
         );
     }
+
+    @Bean
+    public ConsultaTriagemUseCase consultaTriagemUseCase(
+            ConsultaRepository consultaRepository,
+            HorarioDisponivelRepository horarioDisponivelRepository,
+            NotificationService notificationService) {
+
+        return new ConsultaTriagemUseCaseImpl(
+                consultaRepository,
+                horarioDisponivelRepository,
+                notificationService
+        );
+    }
 }
