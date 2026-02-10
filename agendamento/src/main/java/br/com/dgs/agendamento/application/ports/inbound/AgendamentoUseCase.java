@@ -12,4 +12,5 @@ public interface AgendamentoUseCase {
     List<ConsultaOutput> listarConsultasFuturas(ListarConsultasFuturasQuery query);
     ConsultaOutput buscarPorId(Long consultaId);
     ConsultaOutput marcarComoRealizada(Long consultaId);
+    ConsultaOutput marcarComoEmAtendimento(Long consultaId);
 }

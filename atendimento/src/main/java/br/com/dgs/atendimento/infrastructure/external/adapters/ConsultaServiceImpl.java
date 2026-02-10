@@ -86,4 +86,25 @@ public class ConsultaServiceImpl implements ConsultaService {
             throw new RuntimeException("Erro ao marcar consulta como realizada", e);
         }
     }
+
+    @Override
+    public void marcarComoEmAtendimento(ConsultaId consultaId) {
+        try {
+            String serviceToken = authenticationService.getServiceToken();
+            String url = agendamentoServiceUrl + "/internal/consultas/" + consultaId.getValue() + "/em-atendimento";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(serviceToken);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            restTemplate.exchange(url, HttpMethod.PATCH, entity, Void.class);
+
+            log.info("Consulta {} marcada como em atendimento", consultaId.getValue());
+
+        } catch (Exception e) {
+            log.error("Erro ao marcar consulta {} como em atendimento: {}", consultaId.getValue(), e.getMessage());
+            throw new RuntimeException("Erro ao marcar consulta como em atendimento", e);
+        }
+    }
 }

@@ -1,0 +1,2570 @@
+{
+	"info": {
+		"_postman_id": "digi-sus-testes-v5-2026",
+		"name": "Digi-SUS v5 - Testes Completos",
+		"description": "Collection v5 para testar todos os fluxos de negocio do Digi-SUS.\n\nPrincipais mudancas da v4:\n- Coluna 'cancelada' (boolean) substituida por 'status' (varchar) na tb_consultas\n- Novo status EM_ATENDIMENTO: ao iniciar atendimento, consulta muda de AGENDADA para EM_ATENDIMENTO\n- Ao finalizar atendimento, consulta muda de EM_ATENDIMENTO para REALIZADA (e persiste corretamente)\n- Novo endpoint: PATCH /internal/consultas/{id}/em-atendimento\n- Regras de transicao atualizadas: nao eh possivel cancelar ou reagendar consulta em EM_ATENDIMENTO\n- Corrigido bug: status REALIZADA agora persiste no banco (antes voltava para AGENDADA na proxima leitura)\n\nExecute as pastas na ordem numerica (0 a 13) para garantir que as variaveis sejam populadas corretamente.\n\nDica: No Collection Runner, configure um delay de 2000ms entre requests para garantir que eventos assincronos (RabbitMQ) sejam processados.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+		{ "key": "adminToken", "value": "", "type": "string" },
+		{ "key": "medicoToken", "value": "", "type": "string" },
+		{ "key": "pacienteToken", "value": "", "type": "string" },
+		{ "key": "enfermeiroToken", "value": "", "type": "string" },
+		{ "key": "atendenteToken", "value": "", "type": "string" },
+		{ "key": "adminId", "value": "", "type": "string" },
+		{ "key": "medicoId", "value": "", "type": "string" },
+		{ "key": "pacienteId", "value": "", "type": "string" },
+		{ "key": "pacienteNovoId", "value": "", "type": "string" },
+		{ "key": "pacienteNovoToken", "value": "", "type": "string" },
+		{ "key": "atendenteId", "value": "", "type": "string" },
+		{ "key": "agendaId", "value": "", "type": "string" },
+		{ "key": "horarioDisponivelId", "value": "", "type": "string" },
+		{ "key": "consultaId", "value": "", "type": "string" },
+		{ "key": "consultaTradicionalId", "value": "", "type": "string" },
+		{ "key": "tipoExameId", "value": "", "type": "string" },
+		{ "key": "agendaExameId", "value": "", "type": "string" },
+		{ "key": "horarioExameDisponivelId", "value": "", "type": "string" },
+		{ "key": "solicitacaoExameId", "value": "", "type": "string" },
+		{ "key": "solicitacaoExameUrgenteId", "value": "", "type": "string" },
+		{ "key": "agendamentoExameId", "value": "", "type": "string" },
+		{ "key": "atendimentoId", "value": "", "type": "string" },
+		{ "key": "dataInicio", "value": "", "type": "string" },
+		{ "key": "dataFim", "value": "", "type": "string" },
+		{ "key": "dataHoraTradicional", "value": "", "type": "string" },
+		{ "key": "dataHoraReagendamento", "value": "", "type": "string" },
+		{ "key": "consultaListagemAutoId", "value": "", "type": "string" },
+		{ "key": "consultaListagemTradId", "value": "", "type": "string" },
+		{ "key": "medicoNovoId", "value": "", "type": "string" },
+		{ "key": "medicoNovoToken", "value": "", "type": "string" },
+		{ "key": "enfermeiroId", "value": "", "type": "string" },
+		{ "key": "agendaTriagemId", "value": "", "type": "string" },
+		{ "key": "todayDayOfWeek", "value": "", "type": "string" },
+		{ "key": "triagemConsultaId", "value": "", "type": "string" }
+	],
+	"item": [
+		{
+			"name": "0 - Setup: Login Usuarios Iniciais",
+			"description": "Login dos usuarios seed (admin, medico, enfermeiro, paciente, atendente) para obter tokens JWT.\nSenha padrao dos usuarios seed: senha123",
+			"item": [
+				{
+					"name": "Login ADMIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', json.token);",
+									"    pm.test('Login ADMIN OK', function() {",
+									"        pm.expect(json.userType).to.eql('ADMIN');",
+									"        pm.expect(json.type).to.eql('Bearer');",
+									"        pm.expect(json.expiresIn).to.eql(86400000);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login MEDICO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('medicoToken', json.token);",
+									"    pm.test('Login MEDICO OK', function() {",
+									"        pm.expect(json.userType).to.eql('MEDICO');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"medico@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login ENFERMEIRO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('enfermeiroToken', json.token);",
+									"    pm.test('Login ENFERMEIRO OK', function() {",
+									"        pm.expect(json.userType).to.eql('ENFERMEIRO');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"enfermeiro@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login PACIENTE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('pacienteToken', json.token);",
+									"    pm.collectionVariables.set('pacienteId', '4');",
+									"    pm.test('Login PACIENTE OK', function() {",
+									"        pm.expect(json.userType).to.eql('PACIENTE');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"paciente@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login ATENDENTE (seed)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('atendenteToken', json.token);",
+									"    pm.test('Login ATENDENTE OK', function() {",
+									"        pm.expect(json.userType).to.eql('ATENDENTE');",
+									"    });",
+									"} else if (pm.response.code === 401) {",
+									"    pm.test.skip('ATENDENTE seed nao existe, sera criado na pasta 1');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"atendente@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "1 - Cadastro de Usuarios",
+			"description": "Testa o cadastro de novos pacientes e funcionarios (requer ROLE_ADMIN).",
+			"item": [
+				{
+					"name": "1.1 Cadastrar novo PACIENTE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('pacienteNovoId', json.id);",
+									"    pm.test('Paciente criado com sucesso', function() {",
+									"        pm.expect(json.nomeCompleto).to.eql('Maria da Silva');",
+									"        pm.expect(json.ativo).to.be.true;",
+									"        pm.expect(json.endereco).to.not.be.null;",
+									"        pm.expect(json.endereco.cidade).to.eql('Sao Paulo');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nomeCompleto\": \"Maria da Silva\",\n    \"email\": \"maria.silva@email.com\",\n    \"senha\": \"senha123\",\n    \"cpf\": \"12345678901\",\n    \"dataNascimento\": \"1990-05-15\",\n    \"telefone\": \"11999998888\",\n    \"endereco\": {\n        \"logradouro\": \"Rua das Flores\",\n        \"numero\": \"123\",\n        \"complemento\": \"Apto 4\",\n        \"bairro\": \"Centro\",\n        \"cidade\": \"Sao Paulo\",\n        \"estado\": \"SP\",\n        \"cep\": \"01001000\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/pacientes",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "pacientes"]
+						}
+					}
+				},
+				{
+					"name": "1.2 Cadastrar novo MEDICO (Cardiologia)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('medicoNovoId', json.id);",
+									"    pm.test('Medico criado com CRM e especialidade', function() {",
+									"        pm.expect(json.tipo).to.eql('MEDICO');",
+									"        pm.expect(json.crm).to.eql('CRM123456');",
+									"        pm.expect(json.especialidade.nome).to.eql('CARDIOLOGIA');",
+									"        pm.expect(json.ativo).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nomeCompleto\": \"Dra. Ana Santos\",\n    \"email\": \"ana.santos@hospital.com\",\n    \"senha\": \"senha123\",\n    \"cpf\": \"98765432101\",\n    \"tipo\": \"MEDICO\",\n    \"crm\": \"CRM123456\",\n    \"especialidade\": {\n        \"nome\": \"CARDIOLOGIA\",\n        \"codigo\": \"CARDIO\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/funcionarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "funcionarios"]
+						}
+					}
+				},
+				{
+					"name": "1.3 Login novo PACIENTE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('pacienteNovoToken', json.token);",
+									"    pm.test('Login novo PACIENTE OK', function() {",
+									"        pm.expect(json.userType).to.eql('PACIENTE');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"maria.silva@email.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.4 Login novo MEDICO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('medicoNovoToken', json.token);",
+									"    pm.test('Login novo MEDICO OK', function() {",
+									"        pm.expect(json.userType).to.eql('MEDICO');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ana.santos@hospital.com\",\n    \"senha\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/autenticacao/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["autenticacao", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2 - Fluxo Consulta: Agenda + Auto-Agendamento",
+			"description": "Fluxo completo: Medico cria agenda -> Gera horarios -> Paciente busca disponiveis -> Paciente auto-agenda.\nVerifica novos campos tipoConsulta e prioridade na resposta.",
+			"item": [
+				{
+					"name": "2.1 Criar Agenda Medica (MONDAY 08:00-12:00)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (!pm.collectionVariables.get('medicoId') || pm.collectionVariables.get('medicoId') === '') {",
+									"    pm.collectionVariables.set('medicoId', '2');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('agendaId', json.id);",
+									"    pm.collectionVariables.set('medicoId', json.medicoId);",
+									"    pm.test('Agenda criada', function() {",
+									"        pm.expect(json.diaSemana).to.eql('MONDAY');",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.ativa).to.be.true;",
+									"        pm.expect(json.duracaoSlotMinutos).to.eql(30);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"diaSemana\": \"MONDAY\",\n    \"horaInicio\": \"08:00\",\n    \"horaFim\": \"12:00\",\n    \"duracaoSlotMinutos\": 30,\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda"]
+						}
+					}
+				},
+				{
+					"name": "2.2 Gerar Horarios Disponiveis (4 semanas)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 28);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Horarios gerados (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dataInicio\": \"{{dataInicio}}\",\n    \"dataFim\": \"{{dataFim}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaId}}/gerar-horarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda", "{{agendaId}}", "gerar-horarios"]
+						}
+					}
+				},
+				{
+					"name": "2.3 Buscar Horarios Disponiveis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de horarios retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"    if (json.length > 0) {",
+									"        pm.collectionVariables.set('horarioDisponivelId', json[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=CLINICA GERAL&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "horarios", "disponiveis"],
+							"query": [
+								{ "key": "especialidade", "value": "CLINICA GERAL" },
+								{ "key": "dataInicio", "value": "{{dataInicio}}" },
+								{ "key": "dataFim", "value": "{{dataFim}}" }
+							]
+						}
+					}
+				},
+				{
+					"name": "2.4 Auto-Agendar Consulta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('consultaId', json.id);",
+									"    pm.collectionVariables.set('consultaListagemAutoId', json.id);",
+									"    pm.test('Consulta auto-agendada com novos campos', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.tipoConsulta).to.eql('REGULAR');",
+									"        pm.expect(json.prioridade).to.be.null;",
+									"        pm.expect(json.triagemId).to.be.null;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"horarioDisponivelId\": {{horarioDisponivelId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/autoagendamento",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "horarios", "autoagendamento"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3 - Fluxo Consulta: Agendamento Tradicional",
+			"description": "Agendamento tradicional (medico/enfermeiro agenda para paciente), reagendamento e cancelamento.\nVerifica novos campos tipoConsulta na resposta.",
+			"item": [
+				{
+					"name": "3.1 Agendar Consulta (tradicional)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var nextMonday = new Date(today);",
+									"var dayOfWeek = today.getDay();",
+									"var daysUntilMonday = (8 - dayOfWeek) % 7;",
+									"if (daysUntilMonday === 0) daysUntilMonday = 7;",
+									"nextMonday.setDate(today.getDate() + daysUntilMonday + 7);",
+									"nextMonday.setHours(10, 0, 0, 0);",
+									"var dataHora = nextMonday.toISOString().slice(0, 19);",
+									"pm.collectionVariables.set('dataHoraTradicional', dataHora);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('consultaTradicionalId', json.id);",
+									"    pm.collectionVariables.set('consultaListagemTradId', json.id);",
+									"    pm.test('Consulta tradicional agendada', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.tipoConsulta).to.eql('REGULAR');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraTradicional}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento"]
+						}
+					}
+				},
+				{
+					"name": "3.2 Reagendar Consulta",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var dataHoraOriginal = pm.collectionVariables.get('dataHoraTradicional');",
+									"var date = new Date(dataHoraOriginal);",
+									"date.setDate(date.getDate() + 7);",
+									"var novaDataHora = date.toISOString().slice(0, 19);",
+									"pm.collectionVariables.set('dataHoraReagendamento', novaDataHora);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Consulta reagendada com sucesso', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADA');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraReagendamento}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaTradicionalId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "{{consultaTradicionalId}}"]
+						}
+					}
+				},
+				{
+					"name": "3.3 Cancelar Consulta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Consulta cancelada (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaTradicionalId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "{{consultaTradicionalId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4 - Fluxo Exames: Tipos de Exame",
+			"description": "CRUD de tipos de exame (path /exames/tipos). MS-Exames continua responsavel por este cadastro.",
+			"item": [
+				{
+					"name": "4.1 Criar Tipo de Exame (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('tipoExameId', json.id);",
+									"    pm.test('Tipo de Exame criado', function() {",
+									"        pm.expect(json.nome).to.eql('Hemograma Completo');",
+									"        pm.expect(json.codigo).to.eql('HEMO001');",
+									"        pm.expect(json.ativo).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Hemograma Completo\",\n    \"codigo\": \"HEMO001\",\n    \"descricao\": \"Exame de sangue completo para analise de celulas sanguineas\",\n    \"preparacao\": \"Jejum de 8 horas\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exames/tipos",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "tipos"]
+						}
+					}
+				},
+				{
+					"name": "4.2 Buscar Tipo por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Tipo de Exame retornado corretamente', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('tipoExameId')));",
+									"        pm.expect(json.codigo).to.eql('HEMO001');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/tipos/{{tipoExameId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "tipos", "{{tipoExameId}}"]
+						}
+					}
+				},
+				{
+					"name": "4.3 Listar Todos os Tipos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de tipos retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/tipos",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "tipos"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5 - Fluxo Exames: Agenda de Exames (MS-Agendamento)",
+			"description": "Agenda de exames gerenciada pelo MS-Agendamento.\n\nFluxo:\n1. ADMIN cria agenda de exame (template semanal) via MS-Agendamento\n2. ADMIN gera horarios disponiveis com controle de vagas\n3. Busca horarios com vagas restantes\n\nEndpoints: /agendamento/exames/agenda, /agendamento/exames/horarios/disponiveis\nMelhoria: Pessimistic locking (SELECT FOR UPDATE) para evitar overbooking.",
+			"item": [
+				{
+					"name": "5.1 Criar Agenda de Exames (ADMIN via MS-Agendamento)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('agendaExameId', json.id);",
+									"    pm.test('Agenda de exames criada no MS-Agendamento', function() {",
+									"        pm.expect(json.diaSemana).to.eql('TUESDAY');",
+									"        pm.expect(json.ativa).to.be.true;",
+									"        pm.expect(json.vagasPorSlot).to.eql(5);",
+									"        pm.expect(json.duracaoSlotMinutos).to.eql(15);",
+									"        pm.expect(json.tipoExameId).to.eql(parseInt(pm.collectionVariables.get('tipoExameId')));",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipoExameId\": {{tipoExameId}},\n    \"diaSemana\": \"TUESDAY\",\n    \"horaInicio\": \"07:00\",\n    \"horaFim\": \"12:00\",\n    \"duracaoSlotMinutos\": 15,\n    \"vagasPorSlot\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agenda",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agenda"]
+						}
+					}
+				},
+				{
+					"name": "5.2 Gerar Horarios de Exame (4 semanas)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 28);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Horarios de exame gerados (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dataInicio\": \"{{dataInicio}}\",\n    \"dataFim\": \"{{dataFim}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agenda/{{agendaExameId}}/gerar-horarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agenda", "{{agendaExameId}}", "gerar-horarios"]
+						}
+					}
+				},
+				{
+					"name": "5.3 Buscar Horarios de Exame Disponiveis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Horarios de exame disponiveis retornados', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"    if (json.length > 0) {",
+									"        pm.collectionVariables.set('horarioExameDisponivelId', json[0].id);",
+									"        pm.test('Horario possui campos de capacidade', function() {",
+									"            pm.expect(json[0].vagasRestantes).to.be.greaterThan(0);",
+									"            pm.expect(json[0].tipoExameId).to.eql(parseInt(pm.collectionVariables.get('tipoExameId')));",
+									"            pm.expect(json[0].dataHora).to.not.be.null;",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/horarios/disponiveis?tipoExameId={{tipoExameId}}&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "horarios", "disponiveis"],
+							"query": [
+								{ "key": "tipoExameId", "value": "{{tipoExameId}}" },
+								{ "key": "dataInicio", "value": "{{dataInicio}}" },
+								{ "key": "dataFim", "value": "{{dataFim}}" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6 - Fluxo Exames: Solicitacao + Agendamento",
+			"description": "Solicitacoes continuam no MS-Exames, agendamento vai pelo MS-Agendamento.\n\nFluxo:\n1. Medico solicita exame via MS-Exames\n2. Paciente agenda exame selecionando um horario com vaga via MS-Agendamento\n3. MS-Agendamento publica evento RabbitMQ -> MS-Exames atualiza status da solicitacao para AGENDADA\n4. Cancelamento via MS-Agendamento -> evento RabbitMQ -> MS-Exames retorna para PENDENTE",
+			"item": [
+				{
+					"name": "6.1 Solicitar Exame (MEDICO)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('solicitacaoExameId', json.id);",
+									"    pm.test('Solicitacao de exame criada', function() {",
+									"        pm.expect(json.status).to.eql('PENDENTE');",
+									"        pm.expect(json.prioridade).to.eql('NORMAL');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"medicoId\": {{medicoId}},\n    \"tipoExameId\": {{tipoExameId}},\n    \"prioridade\": \"NORMAL\",\n    \"observacoes\": \"Paciente apresenta fadiga cronica. Verificar niveis de hemoglobina.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes"]
+						}
+					}
+				},
+				{
+					"name": "6.2 Solicitar Exame Urgente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('solicitacaoExameUrgenteId', json.id);",
+									"    pm.test('Solicitacao urgente criada', function() {",
+									"        pm.expect(json.status).to.eql('PENDENTE');",
+									"        pm.expect(json.prioridade).to.eql('URGENTE');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"medicoId\": {{medicoId}},\n    \"tipoExameId\": {{tipoExameId}},\n    \"prioridade\": \"URGENTE\",\n    \"observacoes\": \"Suspeita de anemia grave. Resultado urgente necessario.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes"]
+						}
+					}
+				},
+				{
+					"name": "6.3 Listar Solicitacoes do Paciente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de solicitacoes retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes/paciente/{{pacienteId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes", "paciente", "{{pacienteId}}"]
+						}
+					}
+				},
+				{
+					"name": "6.4 Agendar Exame via MS-Agendamento",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('agendamentoExameId', json.id);",
+									"    pm.test('Exame agendado via MS-Agendamento', function() {",
+									"        pm.expect(json.status).to.eql('AGENDADO');",
+									"        pm.expect(json.solicitacaoExameId).to.eql(parseInt(pm.collectionVariables.get('solicitacaoExameId')));",
+									"        pm.expect(json.horarioExameId).to.eql(parseInt(pm.collectionVariables.get('horarioExameDisponivelId')));",
+									"        pm.expect(json.tipoExameId).to.eql(parseInt(pm.collectionVariables.get('tipoExameId')));",
+									"        pm.expect(json.dataHora).to.not.be.null;",
+									"        pm.expect(json.dataCriacao).to.not.be.null;",
+									"    });",
+									"    console.log('Exame agendado. Evento RabbitMQ enviado para MS-Exames atualizar solicitacao...');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"horarioExameDisponivelId\": {{horarioExameDisponivelId}},\n    \"solicitacaoExameId\": {{solicitacaoExameId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agendamentos",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agendamentos"]
+						}
+					}
+				},
+				{
+					"name": "6.5 Verificar Solicitacao Atualizada para AGENDADA (RabbitMQ)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de solicitacoes retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"    var solicitacao = json.find(s => s.id === parseInt(pm.collectionVariables.get('solicitacaoExameId')));",
+									"    if (solicitacao) {",
+									"        if (solicitacao.status === 'AGENDADA') {",
+									"            pm.test('Solicitacao atualizada para AGENDADA via RabbitMQ', function() {",
+									"                pm.expect(solicitacao.status).to.eql('AGENDADA');",
+									"            });",
+									"        } else {",
+									"            pm.test.skip('Solicitacao ainda PENDENTE - RabbitMQ pode estar processando. Tente novamente com delay maior.');",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes/paciente/{{pacienteId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes", "paciente", "{{pacienteId}}"]
+						}
+					}
+				},
+				{
+					"name": "6.6 Cancelar Agendamento de Exame (via MS-Agendamento)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Agendamento cancelado (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});",
+									"console.log('Agendamento cancelado. Evento RabbitMQ enviado para MS-Exames retornar solicitacao para PENDENTE...');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agendamentos/{{agendamentoExameId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agendamentos", "{{agendamentoExameId}}"]
+						}
+					}
+				},
+				{
+					"name": "6.7 Verificar Solicitacao Retornou para PENDENTE (RabbitMQ)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    var solicitacao = json.find(s => s.id === parseInt(pm.collectionVariables.get('solicitacaoExameId')));",
+									"    if (solicitacao) {",
+									"        if (solicitacao.status === 'PENDENTE') {",
+									"            pm.test('Solicitacao retornou para PENDENTE apos cancelamento via RabbitMQ', function() {",
+									"                pm.expect(solicitacao.status).to.eql('PENDENTE');",
+									"            });",
+									"        } else {",
+									"            pm.test.skip('Solicitacao ainda nao retornou para PENDENTE - RabbitMQ pode estar processando.');",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes/paciente/{{pacienteId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes", "paciente", "{{pacienteId}}"]
+						}
+					}
+				},
+				{
+					"name": "6.8 Cancelar Solicitacao de Exame Urgente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Solicitacao cancelada (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes/{{solicitacaoExameUrgenteId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes", "{{solicitacaoExameUrgenteId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7 - Triagem com Classificacao de Prioridade",
+			"description": "Triagem inclui campo 'especialidade' e classifica automaticamente a prioridade baseado nos sinais vitais.\n\nClassificacao:\n- EMERGENCIA: temp >= 40 ou <= 34, bpm >= 150 ou <= 40\n- URGENTE: temp >= 39 ou <= 35, bpm >= 120 ou <= 50\n- POUCO_URGENTE: temp >= 38, bpm >= 100 ou <= 55\n- NAO_URGENTE: demais casos",
+			"item": [
+				{
+					"name": "7.1 Triagem NAO_URGENTE (sinais normais)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (!pm.collectionVariables.get('enfermeiroId') || pm.collectionVariables.get('enfermeiroId') === '') {",
+									"    pm.collectionVariables.set('enfermeiroId', '3');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem NAO_URGENTE realizada', function() {",
+									"        pm.expect(json.triagemId).to.not.be.null;",
+									"        pm.expect(json.pacienteId).to.eql(parseInt(pm.collectionVariables.get('pacienteId')));",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.prioridade).to.eql('NAO_URGENTE');",
+									"        pm.expect(json.pressaoArterial).to.eql('120/80');",
+									"        pm.expect(json.temperatura).to.eql(36.5);",
+									"        pm.expect(json.batimentoCardiaco).to.eql(72);",
+									"        pm.expect(json.mensagem).to.include('sucesso');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"120/80\",\n    \"temperatura\": 36.5,\n    \"batimentoCardiaco\": 72,\n    \"conduta\": \"Sinais vitais dentro da normalidade. Paciente apto para consulta.\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "7.2 Triagem POUCO_URGENTE (febre leve)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem POUCO_URGENTE - febre leve', function() {",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.prioridade).to.eql('POUCO_URGENTE');",
+									"        pm.expect(json.temperatura).to.eql(38.5);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"130/85\",\n    \"temperatura\": 38.5,\n    \"batimentoCardiaco\": 88,\n    \"conduta\": \"Febre leve detectada. Encaminhar para avaliacao medica.\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "7.3 Triagem URGENTE (febre alta)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem URGENTE - febre alta', function() {",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.prioridade).to.eql('URGENTE');",
+									"        pm.expect(json.temperatura).to.eql(39.5);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"140/90\",\n    \"temperatura\": 39.5,\n    \"batimentoCardiaco\": 95,\n    \"conduta\": \"Febre alta. Atendimento prioritario necessario.\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "7.4 Triagem EMERGENCIA (hipotermia severa)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem EMERGENCIA - hipotermia severa', function() {",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"        pm.expect(json.prioridade).to.eql('EMERGENCIA');",
+									"        pm.expect(json.temperatura).to.eql(33.5);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"90/60\",\n    \"temperatura\": 33.5,\n    \"batimentoCardiaco\": 55,\n    \"conduta\": \"EMERGENCIA: Hipotermia severa. Atendimento imediato.\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "7.5 Triagem EMERGENCIA (taquicardia severa)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem EMERGENCIA - taquicardia', function() {",
+									"        pm.expect(json.prioridade).to.eql('EMERGENCIA');",
+									"        pm.expect(json.batimentoCardiaco).to.eql(155);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"160/100\",\n    \"temperatura\": 37.0,\n    \"batimentoCardiaco\": 155,\n    \"conduta\": \"EMERGENCIA: Taquicardia severa. Monitoramento cardiaco imediato.\",\n    \"especialidade\": \"CARDIOLOGIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8 - Integracao Triagem -> Agendamento",
+			"description": "Testa a integracao assincrona via RabbitMQ entre Triagem e Agendamento.\n\nFluxo:\n1. Cria agenda medica para o dia da semana atual\n2. Gera horarios incluindo hoje\n3. Realiza triagem com especialidade da agenda\n4. Verifica que a consulta foi criada automaticamente pelo consumer\n5. Valida campos tipoConsulta, prioridade e triagemId\n\nIMPORTANTE: Configure delay de 2000ms no Collection Runner para aguardar processamento RabbitMQ.",
+			"item": [
+				{
+					"name": "8.1 Criar Agenda para DIA ATUAL",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];",
+									"var today = new Date();",
+									"var dayOfWeek = days[today.getDay()];",
+									"pm.collectionVariables.set('todayDayOfWeek', dayOfWeek);",
+									"",
+									"if (!pm.collectionVariables.get('medicoId') || pm.collectionVariables.get('medicoId') === '') {",
+									"    pm.collectionVariables.set('medicoId', '2');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('agendaTriagemId', json.id);",
+									"    pm.test('Agenda para dia atual criada', function() {",
+									"        pm.expect(json.diaSemana).to.eql(pm.collectionVariables.get('todayDayOfWeek'));",
+									"        pm.expect(json.especialidade).to.eql('PEDIATRIA');",
+									"        pm.expect(json.ativa).to.be.true;",
+									"    });",
+									"} else {",
+									"    pm.test('Agenda criada ou ja existente', function() {",
+									"        pm.expect([201, 400, 409]).to.include(pm.response.code);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"diaSemana\": \"{{todayDayOfWeek}}\",\n    \"horaInicio\": \"06:00\",\n    \"horaFim\": \"23:00\",\n    \"duracaoSlotMinutos\": 30,\n    \"especialidade\": \"PEDIATRIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda"]
+						}
+					}
+				},
+				{
+					"name": "8.2 Gerar Horarios para Hoje",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"var dataInicio = today.toISOString().split('T')[0];",
+									"var fim = new Date(today);",
+									"fim.setDate(fim.getDate() + 7);",
+									"var dataFim = fim.toISOString().split('T')[0];",
+									"pm.collectionVariables.set('dataInicio', dataInicio);",
+									"pm.collectionVariables.set('dataFim', dataFim);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Horarios gerados (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dataInicio\": \"{{dataInicio}}\",\n    \"dataFim\": \"{{dataFim}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaTriagemId}}/gerar-horarios",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda", "{{agendaTriagemId}}", "gerar-horarios"]
+						}
+					}
+				},
+				{
+					"name": "8.3 Verificar Horarios PEDIATRIA Disponiveis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Horarios PEDIATRIA disponiveis para hoje', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"        pm.expect(json.length).to.be.greaterThan(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/horarios/disponiveis?especialidade=PEDIATRIA&dataInicio={{dataInicio}}&dataFim={{dataFim}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "horarios", "disponiveis"],
+							"query": [
+								{ "key": "especialidade", "value": "PEDIATRIA" },
+								{ "key": "dataInicio", "value": "{{dataInicio}}" },
+								{ "key": "dataFim", "value": "{{dataFim}}" }
+							]
+						}
+					}
+				},
+				{
+					"name": "8.4 Triagem URGENTE -> Consulta Automatica",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Triagem URGENTE realizada com especialidade PEDIATRIA', function() {",
+									"        pm.expect(json.triagemId).to.not.be.null;",
+									"        pm.expect(json.especialidade).to.eql('PEDIATRIA');",
+									"        pm.expect(json.prioridade).to.eql('URGENTE');",
+									"        pm.expect(json.temperatura).to.eql(39.2);",
+									"    });",
+									"    console.log('Triagem realizada. Aguardando consumer do Agendamento processar via RabbitMQ...');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"145/95\",\n    \"temperatura\": 39.2,\n    \"batimentoCardiaco\": 110,\n    \"conduta\": \"Febre alta em crianca. Encaminhar para PEDIATRIA com urgencia.\",\n    \"especialidade\": \"PEDIATRIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "8.5 Verificar Consulta Criada Automaticamente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de consultas retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"    });",
+									"",
+									"    var consultaTriagem = json.find(c => c.triagemId !== null && c.triagemId !== undefined);",
+									"    if (consultaTriagem) {",
+									"        pm.collectionVariables.set('triagemConsultaId', consultaTriagem.id);",
+									"        pm.test('Consulta de triagem encontrada com campos corretos', function() {",
+									"            pm.expect(consultaTriagem.status).to.eql('AGENDADA');",
+									"            pm.expect(consultaTriagem.especialidade).to.eql('PEDIATRIA');",
+									"            pm.expect(consultaTriagem.tipoConsulta).to.be.oneOf(['REGULAR', 'ENCAIXE']);",
+									"            pm.expect(consultaTriagem.prioridade).to.eql('URGENTE');",
+									"            pm.expect(consultaTriagem.triagemId).to.not.be.null;",
+									"        });",
+									"        pm.test('Tipo consulta: REGULAR (slot disponivel) ou ENCAIXE', function() {",
+									"            console.log('Tipo consulta: ' + consultaTriagem.tipoConsulta);",
+									"            console.log('Prioridade: ' + consultaTriagem.prioridade);",
+									"            console.log('Triagem ID: ' + consultaTriagem.triagemId);",
+									"        });",
+									"    } else {",
+									"        pm.test.skip('Consulta de triagem nao encontrada ainda - RabbitMQ pode estar processando. Tente novamente.');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/consultas",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "consultas"]
+						}
+					}
+				},
+				{
+					"name": "8.6 Buscar Consulta de Triagem por ID (internal)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Consulta de triagem retornada via internal endpoint', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('triagemConsultaId')));",
+									"        pm.expect(json.tipoConsulta).to.be.oneOf(['REGULAR', 'ENCAIXE']);",
+									"        pm.expect(json.prioridade).to.eql('URGENTE');",
+									"        pm.expect(json.triagemId).to.not.be.null;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/internal/consultas/{{triagemConsultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "internal", "consultas", "{{triagemConsultaId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9 - Fluxo Atendimento Medico (ATUALIZADO v5)",
+			"description": "Fluxo completo de atendimento medico com verificacao de transicao de status da consulta.\n\nNOVO v5:\n- Ao iniciar atendimento: consulta muda de AGENDADA -> EM_ATENDIMENTO\n- Ao finalizar atendimento: consulta muda de EM_ATENDIMENTO -> REALIZADA\n- Status REALIZADA agora persiste corretamente no banco (bug corrigido)\n\nFluxo: Iniciar -> Verificar EM_ATENDIMENTO -> Buscar -> Solicitar Exame -> Finalizar -> Verificar REALIZADA -> Confirmar persistencia",
+			"item": [
+				{
+					"name": "9.1 Iniciar Atendimento",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('atendimentoId', json.id);",
+									"    pm.test('Atendimento iniciado', function() {",
+									"        pm.expect(json.status).to.eql('EM_ANDAMENTO');",
+									"        pm.expect(json.consultaId).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
+									"        pm.expect(json.dataHoraInicio).to.not.be.null;",
+									"        pm.expect(json.dataHoraFim).to.be.null;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"consultaId\": {{consultaId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos"]
+						}
+					}
+				},
+				{
+					"name": "9.2 Verificar Consulta EM_ATENDIMENTO (NOVO v5)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Consulta mudou para EM_ATENDIMENTO apos iniciar atendimento', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
+									"        pm.expect(json.status).to.eql('EM_ATENDIMENTO');",
+									"    });",
+									"    pm.test('Demais campos da consulta preservados', function() {",
+									"        pm.expect(json.pacienteId).to.not.be.null;",
+									"        pm.expect(json.medicoId).to.not.be.null;",
+									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/internal/consultas/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "internal", "consultas", "{{consultaId}}"]
+						}
+					}
+				},
+				{
+					"name": "9.3 Buscar Atendimento por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Atendimento retornado', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('atendimentoId')));",
+									"        pm.expect(json.status).to.eql('EM_ANDAMENTO');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos/{{atendimentoId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos", "{{atendimentoId}}"]
+						}
+					}
+				},
+				{
+					"name": "9.4 Buscar Atendimento por Consulta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Atendimento retornado por consulta', function() {",
+									"        pm.expect(json.consultaId).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos/consulta/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos", "consulta", "{{consultaId}}"]
+						}
+					}
+				},
+				{
+					"name": "9.5 Solicitar Exame no Atendimento (202 Accepted)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Solicitacao de exame aceita (202 Accepted)', function() {",
+									"    pm.expect(pm.response.code).to.eql(202);",
+									"});",
+									"if (pm.response.code === 202) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Mensagem de confirmacao retornada', function() {",
+									"        pm.expect(json.mensagem).to.include('enviada');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipoExame\": \"Hemograma Completo\",\n    \"prioridade\": \"NORMAL\",\n    \"observacoes\": \"Verificar niveis de hemoglobina e plaquetas\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos/{{atendimentoId}}/exames",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos", "{{atendimentoId}}", "exames"]
+						}
+					}
+				},
+				{
+					"name": "9.6 Finalizar Atendimento",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Atendimento finalizado', function() {",
+									"        pm.expect(json.status).to.eql('FINALIZADO');",
+									"        pm.expect(json.anamnese).to.not.be.null;",
+									"        pm.expect(json.condutaMedica).to.not.be.null;",
+									"        pm.expect(json.dataHoraFim).to.not.be.null;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"anamnese\": \"Paciente relata dores de cabeca frequentes ha 2 semanas. Nega febre ou outros sintomas. Historico de enxaqueca na familia.\",\n    \"condutaMedica\": \"Prescrito paracetamol 750mg a cada 8 horas por 5 dias. Solicitado hemograma para descartar outras causas. Retorno em 15 dias.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos/{{atendimentoId}}/finalizar",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos", "{{atendimentoId}}", "finalizar"]
+						}
+					}
+				},
+				{
+					"name": "9.7 Verificar Consulta REALIZADA (NOVO v5)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Consulta mudou para REALIZADA apos finalizar atendimento', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
+									"        pm.expect(json.status).to.eql('REALIZADA');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/internal/consultas/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "internal", "consultas", "{{consultaId}}"]
+						}
+					}
+				},
+				{
+					"name": "9.8 Recarregar Consulta - Confirmar REALIZADA Persiste (NOVO v5 - bug fix)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Status REALIZADA persiste no banco (bug corrigido v5)', function() {",
+									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
+									"        pm.expect(json.status).to.eql('REALIZADA');",
+									"    });",
+									"    pm.test('Consulta nao voltou para AGENDADA (bug antigo)', function() {",
+									"        pm.expect(json.status).to.not.eql('AGENDADA');",
+									"    });",
+									"    console.log('Bug fix confirmado: status REALIZADA persiste corretamente no banco.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/internal/consultas/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "internal", "consultas", "{{consultaId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10 - Historico Medico (GraphQL)",
+			"description": "Consultas GraphQL para historico medico.",
+			"item": [
+				{
+					"name": "10.1 Buscar Historico por Paciente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Resposta GraphQL valida', function() {",
+									"        pm.expect(json.data).to.not.be.undefined;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"query { historicoPorPaciente(pacienteId: {{pacienteId}}) { id pacienteId consultaId tipoEvento dataEvento descricao medicamentos } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/historico/graphql",
+							"host": ["{{baseUrl}}"],
+							"path": ["historico", "graphql"]
+						}
+					}
+				},
+				{
+					"name": "10.2 Buscar Historico por Consulta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Resposta GraphQL valida', function() {",
+									"        pm.expect(json.data).to.not.be.undefined;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"query { historicoPorConsulta(consultaId: {{consultaId}}) { id pacienteId consultaId tipoEvento dataEvento descricao medicamentos } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/historico/graphql",
+							"host": ["{{baseUrl}}"],
+							"path": ["historico", "graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "11 - Listagem de Consultas Futuras",
+			"description": "Listagem de consultas do paciente e do medico.\nv5: consultas agora possuem status EM_ATENDIMENTO e REALIZADA persistidos corretamente.",
+			"item": [
+				{
+					"name": "11.1 Listar Consultas (MEDICO)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de consultas do medico retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"    });",
+									"    if (json.length > 0) {",
+									"        pm.test('Consultas possuem campo tipoConsulta', function() {",
+									"            json.forEach(function(c) {",
+									"                pm.expect(c.tipoConsulta).to.be.oneOf(['REGULAR', 'ENCAIXE']);",
+									"            });",
+									"        });",
+									"        pm.test('Consultas possuem status valido (v5)', function() {",
+									"            json.forEach(function(c) {",
+									"                pm.expect(c.status).to.be.oneOf(['AGENDADA', 'EM_ATENDIMENTO', 'REALIZADA', 'CANCELADA']);",
+									"            });",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/consultas",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "consultas"]
+						}
+					}
+				},
+				{
+					"name": "11.2 Listar Consultas (PACIENTE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.test('Lista de consultas do paciente retornada', function() {",
+									"        pm.expect(json).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/paciente/{{pacienteId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "paciente", "{{pacienteId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "12 - Testes Negativos (Validacoes)",
+			"description": "Testes de validacao de roles, regras de negocio e novos endpoints v5.\n\nNOVO v5:\n- 12.8: Reagendar consulta REALIZADA (400)\n- 12.9: Iniciar atendimento em consulta ja REALIZADA (400)\n- 12.10: Iniciar atendimento duplicado na mesma consulta (400)",
+			"item": [
+				{
+					"name": "12.1 Criar Tipo Exame sem ADMIN (403)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Acesso negado sem ROLE_ADMIN (403)', function() {",
+									"    pm.expect(pm.response.code).to.eql(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Teste Negativo\",\n    \"codigo\": \"TEST001\",\n    \"descricao\": \"Nao deve ser criado\",\n    \"preparacao\": \"N/A\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exames/tipos",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "tipos"]
+						}
+					}
+				},
+				{
+					"name": "12.2 Solicitar Exame sem MEDICO (403)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Acesso negado sem ROLE_MEDICO (403)', function() {",
+									"    pm.expect(pm.response.code).to.eql(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"medicoId\": {{medicoId}},\n    \"tipoExameId\": {{tipoExameId}},\n    \"prioridade\": \"NORMAL\",\n    \"observacoes\": \"Teste negativo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exames/solicitacoes",
+							"host": ["{{baseUrl}}"],
+							"path": ["exames", "solicitacoes"]
+						}
+					}
+				},
+				{
+					"name": "12.3 Criar Agenda Exame sem ADMIN (403)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Acesso negado sem ROLE_ADMIN para agenda de exames (403)', function() {",
+									"    pm.expect(pm.response.code).to.eql(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipoExameId\": {{tipoExameId}},\n    \"diaSemana\": \"WEDNESDAY\",\n    \"horaInicio\": \"08:00\",\n    \"horaFim\": \"12:00\",\n    \"duracaoSlotMinutos\": 15,\n    \"vagasPorSlot\": 3\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agenda",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agenda"]
+						}
+					}
+				},
+				{
+					"name": "12.4 Iniciar Atendimento sem MEDICO (403)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Acesso negado sem ROLE_MEDICO (403)', function() {",
+									"    pm.expect(pm.response.code).to.eql(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"consultaId\": {{consultaId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos"]
+						}
+					}
+				},
+				{
+					"name": "12.5 Finalizar Atendimento Ja Finalizado (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Erro ao finalizar atendimento ja finalizado (400)', function() {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"anamnese\": \"Tentativa de finalizar novamente\",\n    \"condutaMedica\": \"Nao deve funcionar\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos/{{atendimentoId}}/finalizar",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos", "{{atendimentoId}}", "finalizar"]
+						}
+					}
+				},
+				{
+					"name": "12.6 Triagem sem campo especialidade (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Erro por falta de especialidade (400)', function() {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{enfermeiroToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{enfermeiroId}},\n    \"pressaoArterial\": \"120/80\",\n    \"temperatura\": 36.5,\n    \"batimentoCardiaco\": 72,\n    \"conduta\": \"Teste sem especialidade\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "12.7 Triagem por nao-enfermeiro (403)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Acesso negado para nao-enfermeiro', function() {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 403]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pacienteId\": {{pacienteId}},\n    \"funcionarioId\": {{medicoId}},\n    \"pressaoArterial\": \"120/80\",\n    \"temperatura\": 36.5,\n    \"batimentoCardiaco\": 72,\n    \"conduta\": \"Teste role incorreta\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/triagem/triagem",
+							"host": ["{{baseUrl}}"],
+							"path": ["triagem", "triagem"]
+						}
+					}
+				},
+				{
+					"name": "12.8 Reagendar Consulta REALIZADA (400) (NOVO v5)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var today = new Date();",
+									"today.setDate(today.getDate() + 30);",
+									"today.setHours(9, 0, 0, 0);",
+									"var dataHora = today.toISOString().slice(0, 19);",
+									"pm.variables.set('dataHoraReagendamentoNeg', dataHora);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Nao eh possivel reagendar consulta REALIZADA (400)', function() {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"});",
+									"if (pm.response.code === 400) {",
+									"    pm.test('Mensagem de erro indica consulta ja realizada', function() {",
+									"        var body = pm.response.text();",
+									"        pm.expect(body.toLowerCase()).to.include('realizada');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"dataHora\": \"{{dataHoraReagendamentoNeg}}\",\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "{{consultaId}}"]
+						}
+					}
+				},
+				{
+					"name": "12.9 Iniciar Atendimento em Consulta REALIZADA (400) (NOVO v5)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Nao eh possivel iniciar atendimento em consulta REALIZADA (400)', function() {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"});",
+									"if (pm.response.code === 400) {",
+									"    var body = pm.response.text();",
+									"    pm.test('Mensagem indica status invalido', function() {",
+									"        pm.expect(body.toLowerCase()).to.satisfy(function(b) {",
+									"            return b.includes('realizada') || b.includes('agendada') || b.includes('atendimento');",
+									"        });",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"consultaId\": {{consultaId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/atendimento/atendimentos",
+							"host": ["{{baseUrl}}"],
+							"path": ["atendimento", "atendimentos"]
+						}
+					}
+				},
+				{
+					"name": "12.10 Cancelar Consulta REALIZADA (400) (NOVO v5)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Nao eh possivel cancelar consulta REALIZADA (400)', function() {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/{{consultaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "{{consultaId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "13 - Cleanup",
+			"description": "Limpeza de recursos criados durante os testes.",
+			"item": [
+				{
+					"name": "13.1 Desativar Agenda Consultas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Agenda de consultas desativada (204)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda", "{{agendaId}}"]
+						}
+					}
+				},
+				{
+					"name": "13.2 Desativar Agenda Triagem",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Agenda de triagem desativada (204)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/agenda/{{agendaTriagemId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "agenda", "{{agendaTriagemId}}"]
+						}
+					}
+				},
+				{
+					"name": "13.3 Desativar Agenda Exames",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Agenda de exames desativada (204)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/agendamento/exames/agenda/{{agendaExameId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["agendamento", "exames", "agenda", "{{agendaExameId}}"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -22,6 +22,12 @@ public class InternalController {
         return ResponseEntity.ok(toResponseDTO(output));
     }
 
+    @PatchMapping("/consultas/{id}/em-atendimento")
+    public ResponseEntity<ConsultaResponseDTO> marcarComoEmAtendimento(@PathVariable Long id) {
+        ConsultaOutput output = agendamentoUseCase.marcarComoEmAtendimento(id);
+        return ResponseEntity.ok(toResponseDTO(output));
+    }
+
     @PatchMapping("/consultas/{id}/realizada")
     public ResponseEntity<ConsultaResponseDTO> marcarComoRealizada(@PathVariable Long id) {
         ConsultaOutput output = agendamentoUseCase.marcarComoRealizada(id);

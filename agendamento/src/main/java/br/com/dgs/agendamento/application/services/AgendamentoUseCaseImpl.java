@@ -193,6 +193,18 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         return mapToOutput(consultaAtualizada);
     }
 
+    @Override
+    public ConsultaOutput marcarComoEmAtendimento(Long consultaId) {
+        ConsultaId id = new ConsultaId(consultaId);
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada com ID: " + consultaId));
+
+        consulta.iniciarAtendimento();
+        Consulta consultaAtualizada = consultaRepository.save(consulta);
+
+        return mapToOutput(consultaAtualizada);
+    }
+
     private ConsultaOutput mapToOutput(Consulta consulta) {
         return new ConsultaOutput(
                 consulta.getId().getValue(),

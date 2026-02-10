@@ -86,6 +86,12 @@ public class Consulta {
         if (status == StatusConsulta.CANCELADA) {
             throw new ConsultaBusinessException("Não é possível reagendar uma consulta cancelada");
         }
+        if (status == StatusConsulta.EM_ATENDIMENTO) {
+            throw new ConsultaBusinessException("Não é possível reagendar uma consulta em atendimento");
+        }
+        if (status == StatusConsulta.REALIZADA) {
+            throw new ConsultaBusinessException("Não é possível reagendar uma consulta já realizada");
+        }
 
         validarDataFutura(novaDataHora);
 
@@ -98,12 +104,28 @@ public class Consulta {
         if (status == StatusConsulta.CANCELADA) {
             throw new ConsultaBusinessException("Consulta já está cancelada");
         }
+        if (status == StatusConsulta.EM_ATENDIMENTO) {
+            throw new ConsultaBusinessException("Não é possível cancelar uma consulta em atendimento");
+        }
 
         if (tipoConsulta != TipoConsulta.ENCAIXE && dataHora.isBefore(LocalDateTime.now().plusHours(24))) {
             throw new ConsultaBusinessException("Não é possível cancelar consulta com menos de 24h de antecedência");
         }
 
         this.status = StatusConsulta.CANCELADA;
+    }
+
+    public void iniciarAtendimento() {
+        if (status == StatusConsulta.CANCELADA) {
+            throw new ConsultaBusinessException("Não é possível iniciar atendimento de uma consulta cancelada");
+        }
+        if (status == StatusConsulta.EM_ATENDIMENTO) {
+            throw new ConsultaBusinessException("Consulta já está em atendimento");
+        }
+        if (status == StatusConsulta.REALIZADA) {
+            throw new ConsultaBusinessException("Consulta já foi realizada");
+        }
+        this.status = StatusConsulta.EM_ATENDIMENTO;
     }
 
     public void marcarComoRealizada() {

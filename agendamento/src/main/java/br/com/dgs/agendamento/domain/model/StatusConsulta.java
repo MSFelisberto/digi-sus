@@ -2,6 +2,7 @@ package br.com.dgs.agendamento.domain.model;
 
 public enum StatusConsulta {
     AGENDADA,
-    CANCELADA,
-    REALIZADA
+    EM_ATENDIMENTO,
+    REALIZADA,
+    CANCELADA
 }

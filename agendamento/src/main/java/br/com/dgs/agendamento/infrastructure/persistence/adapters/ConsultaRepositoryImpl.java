@@ -43,8 +43,8 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
 
     @Override
     public List<Consulta> findFuturasByPacienteId(PacienteId pacienteId) {
-        return jpaRepository.findByPacienteIdAndCanceladaFalseAndDataHoraAfter(
-                        pacienteId.getValue(), LocalDateTime.now())
+        return jpaRepository.findByPacienteIdAndStatusNotAndDataHoraAfter(
+                        pacienteId.getValue(), StatusConsulta.CANCELADA.name(), LocalDateTime.now())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
@@ -52,8 +52,8 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
 
     @Override
     public List<Consulta> findFuturasByMedicoId(MedicoId medicoId) {
-        return jpaRepository.findByMedicoIdAndCanceladaFalseAndDataHoraAfter(
-                        medicoId.getValue(), LocalDateTime.now())
+        return jpaRepository.findByMedicoIdAndStatusNotAndDataHoraAfter(
+                        medicoId.getValue(), StatusConsulta.CANCELADA.name(), LocalDateTime.now())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
@@ -61,8 +61,8 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
 
     @Override
     public List<Consulta> findAllFuturas() {
-        return jpaRepository.findByCanceladaFalseAndDataHoraAfterOrderByDataHoraAsc(
-                        LocalDateTime.now())
+        return jpaRepository.findByStatusNotAndDataHoraAfterOrderByDataHoraAsc(
+                        StatusConsulta.CANCELADA.name(), LocalDateTime.now())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
@@ -83,7 +83,7 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
         entity.setMedicoId(consulta.getMedicoId().getValue());
         entity.setDataHora(consulta.getDataHora());
         entity.setEspecialidade(consulta.getEspecialidade().getValue());
-        entity.setCancelada(consulta.getStatus() == StatusConsulta.CANCELADA);
+        entity.setStatus(consulta.getStatus().name());
         entity.setTipoConsulta(consulta.getTipoConsulta() != null ? consulta.getTipoConsulta().name() : TipoConsulta.REGULAR.name());
         entity.setPrioridade(consulta.getPrioridade() != null ? consulta.getPrioridade().name() : null);
         entity.setTriagemId(consulta.getTriagemId());
@@ -91,7 +91,7 @@ public class ConsultaRepositoryImpl implements ConsultaRepository {
     }
 
     private Consulta toDomain(ConsultaEntity entity) {
-        StatusConsulta status = entity.isCancelada() ? StatusConsulta.CANCELADA : StatusConsulta.AGENDADA;
+        StatusConsulta status = StatusConsulta.valueOf(entity.getStatus());
         TipoConsulta tipoConsulta = entity.getTipoConsulta() != null ? TipoConsulta.valueOf(entity.getTipoConsulta()) : TipoConsulta.REGULAR;
         Prioridade prioridade = entity.getPrioridade() != null ? Prioridade.valueOf(entity.getPrioridade()) : null;
 
