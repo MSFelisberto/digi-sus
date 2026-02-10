@@ -51,6 +51,8 @@ public class AtendimentoUseCaseImpl implements AtendimentoUseCase {
 
         Atendimento salvo = atendimentoRepository.save(atendimento);
 
+        consultaService.marcarComoEmAtendimento(consultaId);
+
         return mapToOutput(salvo);
     }
 

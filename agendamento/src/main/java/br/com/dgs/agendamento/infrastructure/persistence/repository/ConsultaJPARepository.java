@@ -12,12 +12,12 @@ public interface ConsultaJPARepository extends JpaRepository<ConsultaEntity, Lon
 
     List<ConsultaEntity> findByPacienteId(Long pacienteId);
 
-    List<ConsultaEntity> findByPacienteIdAndCanceladaFalseAndDataHoraAfter(
-            Long pacienteId, LocalDateTime dataHora);
+    List<ConsultaEntity> findByPacienteIdAndStatusNotAndDataHoraAfter(
+            Long pacienteId, String status, LocalDateTime dataHora);
 
-    List<ConsultaEntity> findByMedicoIdAndCanceladaFalseAndDataHoraAfter(
-            Long medicoId, LocalDateTime dataHora);
+    List<ConsultaEntity> findByMedicoIdAndStatusNotAndDataHoraAfter(
+            Long medicoId, String status, LocalDateTime dataHora);
 
-    List<ConsultaEntity> findByCanceladaFalseAndDataHoraAfterOrderByDataHoraAsc(
-            LocalDateTime dataHora);
+    List<ConsultaEntity> findByStatusNotAndDataHoraAfterOrderByDataHoraAsc(
+            String status, LocalDateTime dataHora);
 }
