@@ -65,4 +65,25 @@ public class RabbitMQConfig {
     public Binding bindingTriagemAtendimento(Queue triagemAtendimentoQueue, TopicExchange notificacoesExchange) {
         return BindingBuilder.bind(triagemAtendimentoQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_TRIAGEM_ATENDIMENTO);
     }
+
+    // Filas para eventos de agendamento de exames
+    @Bean
+    public Queue agendamentoExameAgendadoQueue() {
+        return new Queue(RabbitConfig.QUEUE_AGENDAMENTO_EXAME_AGENDADO, true);
+    }
+
+    @Bean
+    public Queue agendamentoExameCanceladoQueue() {
+        return new Queue(RabbitConfig.QUEUE_AGENDAMENTO_EXAME_CANCELADO, true);
+    }
+
+    @Bean
+    public Binding bindingAgendamentoExameAgendado(Queue agendamentoExameAgendadoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(agendamentoExameAgendadoQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_AGENDAMENTO_EXAME_AGENDADO);
+    }
+
+    @Bean
+    public Binding bindingAgendamentoExameCancelado(Queue agendamentoExameCanceladoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(agendamentoExameCanceladoQueue).to(notificacoesExchange).with(RabbitConfig.ROUTING_KEY_AGENDAMENTO_EXAME_CANCELADO);
+    }
 }

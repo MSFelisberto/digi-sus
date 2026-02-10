@@ -60,4 +60,19 @@ public class BeansConfiguration {
                 notificationService
         );
     }
+
+    @Bean
+    public AgendamentoExameUseCase agendamentoExameUseCase(
+            AgendaExameRepository agendaExameRepository,
+            HorarioExameDisponivelRepository horarioExameDisponivelRepository,
+            AgendamentoExameRepository agendamentoExameRepository,
+            ExameEventPublisher exameEventPublisher) {
+
+        return new AgendamentoExameUseCaseImpl(
+                agendaExameRepository,
+                horarioExameDisponivelRepository,
+                agendamentoExameRepository,
+                exameEventPublisher
+        );
+    }
 }
