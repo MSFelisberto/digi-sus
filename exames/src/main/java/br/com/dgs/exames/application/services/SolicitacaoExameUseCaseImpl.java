@@ -15,6 +15,7 @@ import br.com.dgs.exames.domain.exception.PacienteNotFoundException;
 import br.com.dgs.exames.domain.exception.SolicitacaoExameNotFoundException;
 import br.com.dgs.exames.domain.model.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -144,6 +145,36 @@ public class SolicitacaoExameUseCaseImpl implements SolicitacaoExameUseCase {
         solicitacao.cancelar();
         solicitacaoRepository.save(solicitacao);
 
+        if (tipoExame != null) {
+            exameNotificationService.notificarCancelamento(solicitacao, tipoExame);
+        }
+    }
+
+    @Override
+    public void marcarComoAgendada(Long solicitacaoId, LocalDateTime dataHora) {
+        SolicitacaoExameId id = new SolicitacaoExameId(solicitacaoId);
+        SolicitacaoExame solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new SolicitacaoExameNotFoundException(solicitacaoId));
+
+        solicitacao.agendar();
+        solicitacaoRepository.save(solicitacao);
+
+        TipoExame tipoExame = tipoExameRepository.findById(solicitacao.getTipoExameId()).orElse(null);
+        if (tipoExame != null) {
+            exameNotificationService.notificarAgendamento(solicitacao, tipoExame, dataHora);
+        }
+    }
+
+    @Override
+    public void retornarParaPendente(Long solicitacaoId) {
+        SolicitacaoExameId id = new SolicitacaoExameId(solicitacaoId);
+        SolicitacaoExame solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new SolicitacaoExameNotFoundException(solicitacaoId));
+
+        solicitacao.retornarParaPendente();
+        solicitacaoRepository.save(solicitacao);
+
+        TipoExame tipoExame = tipoExameRepository.findById(solicitacao.getTipoExameId()).orElse(null);
         if (tipoExame != null) {
             exameNotificationService.notificarCancelamento(solicitacao, tipoExame);
         }

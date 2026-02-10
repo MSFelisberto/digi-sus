@@ -33,4 +33,11 @@ public class RabbitConfig {
 
     public static final String ROUTING_KEY_ATENDIMENTO_FINALIZADO = "atendimento.finalizado";
     public static final String ROUTING_KEY_ATENDIMENTO_EXAME_SOLICITAR = "atendimento.exame.solicitar";
+
+    // Agendamento de Exames (comunicação entre MS-Agendamento e MS-Exames)
+    public static final String QUEUE_AGENDAMENTO_EXAME_AGENDADO = "agendamento.exame.agendado.queue";
+    public static final String QUEUE_AGENDAMENTO_EXAME_CANCELADO = "agendamento.exame.cancelado.queue";
+
+    public static final String ROUTING_KEY_AGENDAMENTO_EXAME_AGENDADO = "agendamento.exame.agendado";
+    public static final String ROUTING_KEY_AGENDAMENTO_EXAME_CANCELADO = "agendamento.exame.cancelado";
 }

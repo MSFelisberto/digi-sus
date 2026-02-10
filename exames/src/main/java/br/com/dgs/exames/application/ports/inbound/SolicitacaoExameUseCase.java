@@ -5,6 +5,7 @@ import br.com.dgs.exames.application.dto.CriarSolicitacaoExamePorNomeCommand;
 import br.com.dgs.exames.application.dto.ListarSolicitacoesQuery;
 import br.com.dgs.exames.application.dto.SolicitacaoExameOutput;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SolicitacaoExameUseCase {
@@ -13,4 +14,6 @@ public interface SolicitacaoExameUseCase {
     List<SolicitacaoExameOutput> listarPorPaciente(ListarSolicitacoesQuery query);
     List<SolicitacaoExameOutput> listarPorAtendimento(Long atendimentoId);
     void cancelarSolicitacao(Long solicitacaoId);
+    void marcarComoAgendada(Long solicitacaoId, LocalDateTime dataHora);
+    void retornarParaPendente(Long solicitacaoId);
 }

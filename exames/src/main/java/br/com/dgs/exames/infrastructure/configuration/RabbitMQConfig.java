@@ -65,4 +65,29 @@ public class RabbitMQConfig {
                 .to(notificacoesExchange)
                 .with(RabbitConfig.ROUTING_KEY_EXAME_CANCELAR);
     }
+
+    // Queues para receber eventos de agendamento do MS-Agendamento
+    @Bean
+    public Queue agendamentoExameAgendadoQueue() {
+        return new Queue(RabbitConfig.QUEUE_AGENDAMENTO_EXAME_AGENDADO, true);
+    }
+
+    @Bean
+    public Queue agendamentoExameCanceladoQueue() {
+        return new Queue(RabbitConfig.QUEUE_AGENDAMENTO_EXAME_CANCELADO, true);
+    }
+
+    @Bean
+    public Binding bindingAgendamentoExameAgendado(Queue agendamentoExameAgendadoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(agendamentoExameAgendadoQueue)
+                .to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_AGENDAMENTO_EXAME_AGENDADO);
+    }
+
+    @Bean
+    public Binding bindingAgendamentoExameCancelado(Queue agendamentoExameCanceladoQueue, TopicExchange notificacoesExchange) {
+        return BindingBuilder.bind(agendamentoExameCanceladoQueue)
+                .to(notificacoesExchange)
+                .with(RabbitConfig.ROUTING_KEY_AGENDAMENTO_EXAME_CANCELADO);
+    }
 }

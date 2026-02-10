@@ -27,14 +27,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AgendamentoExameNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleAgendamentoExameNotFoundException(AgendamentoExameNotFoundException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "Agendamento de Exame Não Encontrado", "message", ex.getMessage()),
-                HttpStatus.NOT_FOUND
-        );
-    }
-
     @ExceptionHandler(PacienteNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePacienteNotFoundException(PacienteNotFoundException ex) {
         return new ResponseEntity<>(
@@ -47,14 +39,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleExameBusinessException(ExameBusinessException ex) {
         return new ResponseEntity<>(
                 Map.of("error", "Regra de Negócio Violada", "message", ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-        );
-    }
-
-    @ExceptionHandler(VagaExameIndisponivelException.class)
-    public ResponseEntity<Map<String, String>> handleVagaExameIndisponivelException(VagaExameIndisponivelException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "Vaga Indisponível", "message", ex.getMessage()),
                 HttpStatus.BAD_REQUEST
         );
     }
