@@ -26,6 +26,7 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
 18. [Regras de Negocio](#18-regras-de-negocio)
 19. [Decisoes Arquiteturais](#19-decisoes-arquiteturais)
 20. [Testes com Postman](#20-testes-com-postman)
+21. [Vídeos](#21-Videos)
 
 ---
 
@@ -1486,3 +1487,9 @@ O projeto inclui uma collection Postman completa para testar todos os fluxos:
 | 12. Consultas Futuras | Listar consultas futuras por role |
 
 **Variavel base:** `{{baseUrl}}` = `http://localhost:8080`
+
+## 21. Videos
+
+[`Pitch`](https://youtu.be/Ymh1Utz_OAo)
+
+
