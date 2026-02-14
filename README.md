@@ -2,6 +2,16 @@
 
 Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em arquitetura de microsservicos com Java 21, Spring Boot 3.5.5 e Spring Cloud 2025.0.0.
 
+# Projeto FIAP
+
+Equipe: Grupo 32
+Integrantes: Marcos Felisberto, Fernando César Bertolo Júnior, Heider Bezerra Soares, Leonardo Doretto Mattioli
+Data: Fevereiro de 2026
+
+Videos de Apresentação:
+[Pitch do Problema](https://www.youtube.com/watch?v=Ymh1Utz_OAo)
+[Apresentação Tecnica](https://youtu.be/4qqU9U73Pcc)
+
 ---
 
 ## Sumario
@@ -17,7 +27,7 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
 9. [Agenda Medica e Auto-Agendamento](#9-agenda-medica-e-auto-agendamento)
 10. [Triagem e Consulta de Urgencia](#10-triagem-e-consulta-de-urgencia)
 11. [Atendimento Medico](#11-atendimento-medico)
-12. [Agendamento de Exames](#12-agendamento-de-exames)
+12. [Gestão de Exames](#12-gestao-de-exames)
 13. [Historico Medico (GraphQL)](#13-historico-medico-graphql)
 14. [Notificacoes](#14-notificacoes)
 15. [Comunicacao Assincrona (RabbitMQ)](#15-comunicacao-assincrona-rabbitmq)
@@ -54,7 +64,8 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
      |            | |           | |          | |           |  |            |
      | - Login    | | - Consultas| |- Sinais | |- Iniciar  |  |- Tipos    |
      | - Cadastro | | - Agenda  | |  vitais  | |- Finalizar|  |- Solicitar|
-     | - JWT      | | - Horarios| |- Classif.| |- Exames   |  |- Agendar  |
+     | - JWT      | | - Horarios| |- Classif.| |- Exames   |  |           |
+     |            | | - Exames  | |          | |- Status   |  |           |
      +------------+ +-----+-----+ +----+-----+ +-----+-----+  +-----+-----+
                            |            |             |              |
                     +------+------------+-------------+--------------+---+
@@ -78,10 +89,10 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
 | **server** | 8761 | - | Eureka Service Registry - descoberta de servicos |
 | **gateway** | 8080 | - | API Gateway - roteamento, validacao JWT, injecao de headers |
 | **autenticacao** | dinamica | db_autenticacao | Cadastro de pacientes/funcionarios, emissao JWT |
-| **agendamento** | dinamica | db_agendamento | Consultas, agendas medicas, horarios disponiveis |
+| **agendamento** | dinamica | db_agendamento | Consultas, agendas medicas, horarios disponiveis, agendamento de exames |
 | **triagem** | dinamica | - | Registro de sinais vitais, classificacao de prioridade (stateless) |
 | **atendimento** | dinamica | db_atendimento | Atendimento medico, anamnese, conduta medica |
-| **exames** | dinamica | db_exames | Tipos de exame, solicitacoes, agendas e agendamentos de exame |
+| **exames** | dinamica | db_exames | Tipos de exame e solicitacoes de exame (agendamento de exames migrado para MS-Agendamento) |
 | **historico** | dinamica | db_historico | Historico medico via GraphQL, consome eventos RabbitMQ |
 | **notificacoes** | dinamica | - | Consome eventos e simula envio de emails (stateless) |
 | **commons** | - | - | Biblioteca compartilhada (DTOs, configuracao RabbitMQ) |
@@ -798,10 +809,11 @@ O modulo de atendimento gerencia a consulta medica propriamente dita, desde o in
 ```
 
 **Fluxo:**
-1. Busca consulta no Agendamento via REST (`/internal/consultas/{id}`)
-2. Valida que a consulta existe e esta com status AGENDADA
-3. Cria atendimento com status `EM_ANDAMENTO`
-4. Marca consulta como `REALIZADA` no Agendamento (`/internal/consultas/{id}/realizada`)
+1. Busca consulta no Agendamento via REST service-to-service (`/internal/consultas/{id}`)
+2. Valida que a consulta existe e esta com status `AGENDADA`
+3. Valida que o medico autenticado eh o medico da consulta
+4. Cria atendimento com status `EM_ANDAMENTO`
+5. Marca consulta como `EM_ATENDIMENTO` no Agendamento (`/internal/consultas/{id}/em-atendimento`)
 
 ### 11.2 Finalizar Atendimento
 
@@ -817,8 +829,9 @@ O modulo de atendimento gerencia a consulta medica propriamente dita, desde o in
 **Fluxo:**
 1. Valida que atendimento esta `EM_ANDAMENTO`
 2. Registra anamnese e conduta medica
-3. Marca como `FINALIZADO` com dataHoraFim
-4. Publica evento `atendimento.finalizado` no RabbitMQ
+3. Marca atendimento como `FINALIZADO` com dataHoraFim
+4. Marca consulta como `REALIZADA` no Agendamento (`/internal/consultas/{id}/realizada`)
+5. Publica evento `atendimento.finalizado` no RabbitMQ
 
 ### 11.3 Solicitar Exame durante Atendimento
 
@@ -842,11 +855,15 @@ Publica evento `atendimento.exame.solicitar` no RabbitMQ, consumido pelo modulo 
 
 ---
 
-## 12. Agendamento de Exames
+## 12. Gestao de Exames
 
-O modulo de exames gerencia todo o ciclo de vida: tipos de exame, solicitacoes medicas, agendas e agendamentos.
+A gestao de exames eh dividida entre dois microsservicos:
+- **MS-Exames:** Cadastro de tipos de exame e gestao de solicitacoes
+- **MS-Agendamento:** Agendamento de exames (agendas, horarios disponiveis, reserva de vagas com lock pessimista)
 
-### 12.1 Cadastrar Tipo de Exame
+A comunicacao entre eles eh feita via RabbitMQ: quando um exame eh agendado ou cancelado no MS-Agendamento, um evento eh publicado e o MS-Exames atualiza o status da solicitacao automaticamente.
+
+### 12.1 Cadastrar Tipo de Exame (MS-Exames)
 
 **Endpoint:** `POST /exames/tipos` (requer `ROLE_ADMIN`)
 
@@ -865,9 +882,9 @@ O modulo de exames gerencia todo o ciclo de vida: tipos de exame, solicitacoes m
 - `GET /exames/tipos` (autenticado) - Listar todos
 - `GET /exames/tipos/{id}` (autenticado) - Buscar por ID
 
-### 12.2 Medico Solicita Exame
+### 12.2 Solicitacao de Exame (MS-Exames)
 
-**Endpoint:** `POST /exames/solicitacoes` (requer `ROLE_MEDICO` ou `ROLE_SISTEMA`)
+**Via endpoint direto:** `POST /exames/solicitacoes` (requer `ROLE_MEDICO` ou `ROLE_SISTEMA`)
 
 ```json
 {
@@ -881,11 +898,19 @@ O modulo de exames gerencia todo o ciclo de vida: tipos de exame, solicitacoes m
 }
 ```
 
+**Via atendimento medico:** `POST /atendimento/atendimentos/{id}/exames` — publica evento RabbitMQ `atendimento.exame.solicitar` que o MS-Exames consome e cria a solicitacao automaticamente.
+
 **Status da solicitacao:** `PENDENTE` -> `AGENDADA` -> `REALIZADA` ou `CANCELADA`
 
-### 12.3 Admin Cria Agenda de Exame
+### 12.3 Listar e Cancelar Solicitacoes (MS-Exames)
 
-**Endpoint:** `POST /exames/agendamentos/agenda` (requer `ROLE_ADMIN`)
+- `GET /exames/solicitacoes/paciente/{pacienteId}` (requer `ROLE_MEDICO`, `ROLE_PACIENTE` ou `ROLE_ADMIN`)
+- `GET /exames/solicitacoes/atendimento/{atendimentoId}` (requer `ROLE_MEDICO`, `ROLE_ENFERMEIRO` ou `ROLE_ADMIN`)
+- `DELETE /exames/solicitacoes/{id}` (requer `ROLE_MEDICO` ou `ROLE_ADMIN`)
+
+### 12.4 Criar Agenda de Exame (MS-Agendamento)
+
+**Endpoint:** `POST /agendamento/exames/agenda` (requer `ROLE_ADMIN`)
 
 ```json
 {
@@ -900,41 +925,64 @@ O modulo de exames gerencia todo o ciclo de vida: tipos de exame, solicitacoes m
 
 Diferente da agenda medica, a agenda de exame tem **multiplas vagas por slot** (`vagasPorSlot`). Ate 3 pacientes podem agendar no mesmo horario.
 
-### 12.4 Buscar Vagas de Exame
+### 12.5 Gerar Horarios de Exame (MS-Agendamento)
 
-**Endpoint:** `GET /exames/agendamentos/vagas?tipoExameId=1&dataInicio=2026-02-03&dataFim=2026-02-28` (autenticado)
-
-```json
-[
-  { "dataHora": "2026-02-04T07:00:00", "vagasRestantes": 3, "tipoExameId": 1 },
-  { "dataHora": "2026-02-04T07:20:00", "vagasRestantes": 2, "tipoExameId": 1 }
-]
-```
-
-**Vagas computadas dinamicamente** (nao persistidas) — menor contencao que slots de consulta.
-
-### 12.5 Agendar Exame
-
-**Endpoint:** `POST /exames/agendamentos` (requer `ROLE_PACIENTE`, `ROLE_ATENDENTE` ou `ROLE_ADMIN`)
+**Endpoint:** `POST /agendamento/exames/agenda/{id}/gerar-horarios` (requer `ROLE_ADMIN`)
 
 ```json
 {
-  "solicitacaoExameId": 1,
-  "dataHora": "2026-02-04T07:00:00"
+  "dataInicio": "2026-02-03",
+  "dataFim": "2026-03-01"
 }
 ```
 
-### 12.6 Cancelar Agendamento de Exame
+Gera slots persistidos em `tb_horarios_exame_disponiveis` com controle de vagas (`vagas_totais`, `vagas_ocupadas`).
 
-**Endpoint:** `DELETE /exames/agendamentos/{id}` (requer `ROLE_PACIENTE` ou `ROLE_ADMIN`)
+### 12.6 Buscar Horarios de Exame Disponiveis (MS-Agendamento)
 
-Retorna a solicitacao para status `PENDENTE` (permite re-agendamento). A vaga eh automaticamente liberada.
+**Endpoint:** `GET /agendamento/exames/horarios/disponiveis?tipoExameId=1&dataInicio=2026-02-03&dataFim=2026-02-28` (autenticado)
 
-### 12.7 Listar e Cancelar Solicitacoes
+```json
+[
+  { "id": 1, "tipoExameId": 1, "dataHora": "2026-02-04T07:00:00", "vagasRestantes": 3 },
+  { "id": 2, "tipoExameId": 1, "dataHora": "2026-02-04T07:20:00", "vagasRestantes": 2 }
+]
+```
 
-- `GET /exames/solicitacoes/paciente/{pacienteId}` (requer `ROLE_MEDICO`, `ROLE_PACIENTE` ou `ROLE_ADMIN`)
-- `GET /exames/solicitacoes/atendimento/{atendimentoId}` (requer `ROLE_MEDICO`, `ROLE_ENFERMEIRO` ou `ROLE_ADMIN`)
-- `DELETE /exames/solicitacoes/{id}` (requer `ROLE_MEDICO` ou `ROLE_ADMIN`)
+Retorna apenas horarios com vagas disponiveis (`vagas_ocupadas < vagas_totais`).
+
+### 12.7 Agendar Exame (MS-Agendamento)
+
+**Endpoint:** `POST /agendamento/exames/agendamentos` (requer `ROLE_PACIENTE`, `ROLE_ATENDENTE` ou `ROLE_ADMIN`)
+
+```json
+{
+  "horarioExameDisponivelId": 1,
+  "solicitacaoExameId": 1
+}
+```
+
+**Fluxo com lock pessimista:**
+1. `SELECT FOR UPDATE` no horario de exame
+2. Verifica vagas disponiveis (`vagas_ocupadas < vagas_totais`)
+3. Cria agendamento com status `AGENDADO`
+4. Incrementa `vagas_ocupadas` no horario
+5. Publica evento `agendamento.exame.agendado` no RabbitMQ -> MS-Exames atualiza solicitacao para `AGENDADA`
+6. Publica evento `notificacao.exame.agendar` -> Notificacoes
+
+### 12.8 Cancelar Agendamento de Exame (MS-Agendamento)
+
+**Endpoint:** `DELETE /agendamento/exames/agendamentos/{id}` (requer `ROLE_PACIENTE` ou `ROLE_ADMIN`)
+
+**Fluxo:**
+1. Marca agendamento como `CANCELADO`
+2. Decrementa `vagas_ocupadas` no horario (libera vaga)
+3. Publica evento `agendamento.exame.cancelado` no RabbitMQ -> MS-Exames retorna solicitacao para `PENDENTE`
+4. Publica evento `notificacao.exame.cancelar` -> Notificacoes
+
+### 12.9 Desativar Agenda de Exame (MS-Agendamento)
+
+**Endpoint:** `DELETE /agendamento/exames/agenda/{id}` (requer `ROLE_ADMIN`)
 
 ---
 
@@ -1019,20 +1067,23 @@ Em producao, esses logs seriam substituidos por chamadas reais a servicos de ema
 ```
 Exchange: "notificacoes" (Topic Exchange)
 |
-|-- Routing: notificacao.agendar        --> Queue: notificacao.agendar.queue        --> Notificacoes
-|-- Routing: notificacao.cancelar       --> Queue: notificacao.cancelar.queue       --> Notificacoes
-|-- Routing: notificacao.reagendar      --> Queue: notificacao.reagendar.queue      --> Notificacoes
-|-- Routing: notificacao.historico      --> Queue: notificacao.historico.queue      --> Historico
+|-- Routing: notificacao.agendar         --> Queue: notificacao.agendar.queue         --> Notificacoes
+|-- Routing: notificacao.cancelar        --> Queue: notificacao.cancelar.queue        --> Notificacoes
+|-- Routing: notificacao.reagendar       --> Queue: notificacao.reagendar.queue       --> Notificacoes
+|-- Routing: notificacao.historico       --> Queue: notificacao.historico.queue       --> Historico
 |
-|-- Routing: notificacao.exame.solicitar --> Queue: notificacao.exame.queue         --> Notificacoes
-|-- Routing: notificacao.exame.agendar   --> Queue: notificacao.exame.agendar      --> Notificacoes
-|-- Routing: notificacao.exame.cancelar  --> Queue: notificacao.exame.cancelar     --> Notificacoes
+|-- Routing: notificacao.exame.solicitar --> Queue: notificacao.exame.queue           --> Notificacoes
+|-- Routing: notificacao.exame.agendar   --> Queue: notificacao.exame.agendar        --> Notificacoes
+|-- Routing: notificacao.exame.cancelar  --> Queue: notificacao.exame.cancelar       --> Notificacoes
 |
-|-- Routing: triagem.atendimento        --> Queue: triagem.atendimento.queue       --> Agendamento
-|-- Routing: triagem.historico          --> Queue: triagem.historico.queue          --> Historico
+|-- Routing: triagem.atendimento         --> Queue: triagem.atendimento.queue        --> Agendamento
+|-- Routing: triagem.historico           --> Queue: triagem.historico.queue           --> Historico
 |
-|-- Routing: atendimento.finalizado     --> Queue: atendimento.finalizado.queue    --> (listener)
+|-- Routing: atendimento.finalizado      --> Queue: atendimento.finalizado.queue     --> (listener)
 |-- Routing: atendimento.exame.solicitar --> Queue: atendimento.exame.solicitar.queue --> Exames
+|
+|-- Routing: agendamento.exame.agendado  --> Queue: agendamento.exame.agendado.queue --> Exames
+|-- Routing: agendamento.exame.cancelado --> Queue: agendamento.exame.cancelado.queue --> Exames
 ```
 
 ### DTOs de Mensagem
@@ -1042,6 +1093,7 @@ Exchange: "notificacoes" (Topic Exchange)
 | **ConsultaDTO** | pacienteId, medicoId, dataHora, especialidade | Agendamento | Notificacoes |
 | **HistoricoEventDTO** | consultaId, pacienteId, medicoId, dataHora, especialidade, tipoEvento | Agendamento | Historico |
 | **ExameEventDTO** | solicitacaoExameId, pacienteId, medicoId, tipoExameNome, prioridade, dataHora, tipoEvento | Exames | Notificacoes |
+| **AgendamentoExameEventDTO** | agendamentoExameId, solicitacaoExameId, tipoExameId, dataHora, status | Agendamento | Exames |
 | **TriagemAtendimentoDTO** | pacienteId, triagemId, dadosClinicos, conduta, especialidade, prioridade | Triagem | Agendamento |
 | **TriagemHistoricoDTO** | triagemId, pacienteId, funcionarioId, pressaoArterial, temperatura, batimentoCardiaco, conduta, especialidade, prioridade | Triagem | Historico |
 
@@ -1108,7 +1160,7 @@ PostgreSQL (porta 5432, user: admin, password: admin)
 | medico_id | BIGINT | Referencia ao medico |
 | data_hora | TIMESTAMP | Data e hora da consulta |
 | especialidade | VARCHAR | Especialidade medica |
-| status | VARCHAR | AGENDADA, CANCELADA, REALIZADA |
+| status | VARCHAR | AGENDADA, EM_ATENDIMENTO, REALIZADA, CANCELADA |
 | tipo_consulta | VARCHAR(20) | REGULAR, ENCAIXE (default: REGULAR) |
 | prioridade | VARCHAR(20) | EMERGENCIA, URGENTE, POUCO_URGENTE, NAO_URGENTE (nullable) |
 | triagem_id | BIGINT | ID da triagem que originou (nullable) |
@@ -1137,6 +1189,42 @@ PostgreSQL (porta 5432, user: admin, password: admin)
 | especialidade | VARCHAR | Especialidade |
 | ocupado | BOOLEAN | Slot esta reservado |
 | consulta_id | BIGINT | Consulta vinculada (nullable) |
+
+**tb_agendas_exame**
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | BIGSERIAL PK | ID da agenda |
+| tipo_exame_id | BIGINT | Tipo de exame |
+| dia_semana | VARCHAR(20) | Dia da semana |
+| hora_inicio | TIME | Inicio |
+| hora_fim | TIME | Fim |
+| duracao_slot_minutos | INT | Duracao do slot |
+| vagas_por_slot | INT | Vagas simultaneas |
+| ativa | BOOLEAN | Status |
+
+**tb_horarios_exame_disponiveis**
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | BIGSERIAL PK | ID do horario |
+| agenda_exame_id | BIGINT FK | Referencia a agenda de exame |
+| tipo_exame_id | BIGINT | Tipo de exame |
+| data_hora | TIMESTAMP UNIQUE(tipo_exame) | Data/hora do slot |
+| vagas_totais | INT | Total de vagas no horario |
+| vagas_ocupadas | INT | Vagas ja reservadas (lock pessimista) |
+
+**tb_agendamentos_exame**
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | BIGSERIAL PK | ID do agendamento |
+| horario_exame_id | BIGINT FK | Horario de exame reservado |
+| solicitacao_exame_id | BIGINT | Solicitacao vinculada (no MS-Exames) |
+| tipo_exame_id | BIGINT | Tipo de exame |
+| data_hora | TIMESTAMP | Data/hora agendada |
+| status | VARCHAR(20) | AGENDADO, CANCELADO, REALIZADO |
+| data_criacao | TIMESTAMP | Data de criacao |
 
 ### 16.4 db_atendimento
 
@@ -1182,29 +1270,7 @@ PostgreSQL (porta 5432, user: admin, password: admin)
 | status | VARCHAR | PENDENTE, AGENDADA, REALIZADA, CANCELADA |
 | data_criacao | TIMESTAMP | Data de criacao |
 
-**tb_agendas_exame**
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | BIGSERIAL PK | ID da agenda |
-| tipo_exame_id | BIGINT FK | Tipo de exame |
-| dia_semana | VARCHAR | Dia da semana |
-| hora_inicio | TIME | Inicio |
-| hora_fim | TIME | Fim |
-| duracao_slot_minutos | INT | Duracao do slot |
-| vagas_por_slot | INT | Vagas simultaneas |
-| ativa | BOOLEAN | Status |
-
-**tb_agendamentos_exame**
-
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | BIGSERIAL PK | ID do agendamento |
-| solicitacao_exame_id | BIGINT FK | Solicitacao vinculada |
-| tipo_exame_id | BIGINT FK | Tipo de exame |
-| data_hora | TIMESTAMP | Data/hora agendada |
-| status | VARCHAR | AGENDADO, CANCELADO, REALIZADO |
-| data_criacao | TIMESTAMP | Data de criacao |
+**Nota:** As tabelas `tb_agendas_exame` e `tb_agendamentos_exame` foram migradas para o `db_agendamento` (migration V6 remove essas tabelas do MS-Exames).
 
 ### 16.6 db_historico
 
@@ -1247,12 +1313,15 @@ PostgreSQL (porta 5432, user: admin, password: admin)
 | autenticacao | V4 | Migra usuarios das tabelas antigas |
 | autenticacao | V5 | Remove tb_usuarios |
 | autenticacao | V6 | Adiciona tipos TECNICO_LABORATORIO e ATENDENTE |
+| autenticacao | V7 | Insere medicos com especialidades |
 | agendamento | V1 | Cria tb_consultas |
 | agendamento | V2 | Cria tb_agendas e tb_horarios_disponiveis |
 | agendamento | V3 | Cria tabelas de exame (movidas depois) |
 | agendamento | V4 | Insere tipos de exame iniciais (movidos depois) |
 | agendamento | V5 | Remove tabelas de exame (migradas para modulo exames) |
 | agendamento | V6 | Adiciona tipo_consulta, prioridade, triagem_id em tb_consultas |
+| agendamento | V7 | Cria tabelas de agendamento de exame (tb_agendas_exame, tb_horarios_exame_disponiveis, tb_agendamentos_exame) |
+| agendamento | V8 | Substitui campo cancelada por status (AGENDADA, EM_ATENDIMENTO, REALIZADA, CANCELADA) |
 | atendimento | V1 | Cria tb_atendimentos e tb_exames_solicitados |
 | atendimento | V2 | Remove tb_exames_solicitados (migrada para modulo exames) |
 | exames | V1 | Cria tb_tipos_exame |
@@ -1260,8 +1329,11 @@ PostgreSQL (porta 5432, user: admin, password: admin)
 | exames | V3 | Cria tb_agendas_exame |
 | exames | V4 | Cria tb_agendamentos_exame |
 | exames | V5 | Insere tipos de exame iniciais |
+| exames | V6 | Remove tabelas de agendamento (migradas para MS-Agendamento) |
 | historico | V1 | Cria tb_historico_consultas |
 | historico | V2 | Cria tb_historico_triagens |
+
+**Total: 25 migrations**
 
 ---
 
@@ -1314,11 +1386,23 @@ Todos os endpoints sao acessados via Gateway na porta **8080** com o prefixo do 
 | GET | `/agendamento/horarios/disponiveis` | Autenticado | Buscar horarios (params: especialidade, dataInicio, dataFim) |
 | POST | `/agendamento/horarios/autoagendamento` | PACIENTE, ATENDENTE | Auto-agendar em slot disponivel |
 
+### Agendamento - Exames (`/agendamento/exames/...`)
+
+| Metodo | Endpoint | Role | Descricao |
+|--------|----------|------|-----------|
+| POST | `/agendamento/exames/agenda` | ADMIN | Criar agenda de exame |
+| DELETE | `/agendamento/exames/agenda/{id}` | ADMIN | Desativar agenda de exame |
+| POST | `/agendamento/exames/agenda/{id}/gerar-horarios` | ADMIN | Gerar horarios disponiveis |
+| GET | `/agendamento/exames/horarios/disponiveis` | Autenticado | Buscar horarios (params: tipoExameId, dataInicio, dataFim) |
+| POST | `/agendamento/exames/agendamentos` | PACIENTE, ATENDENTE, ADMIN | Agendar exame |
+| DELETE | `/agendamento/exames/agendamentos/{id}` | PACIENTE, ADMIN | Cancelar agendamento |
+
 **Endpoints internos (Agendamento):**
 
 | Metodo | Endpoint | Role | Descricao |
 |--------|----------|------|-----------|
 | GET | `/internal/consultas/{id}` | - | Buscar consulta por ID |
+| PATCH | `/internal/consultas/{id}/em-atendimento` | - | Marcar consulta como em atendimento |
 | PATCH | `/internal/consultas/{id}/realizada` | - | Marcar consulta como realizada |
 
 ### Triagem (`/triagem/...`)
@@ -1348,10 +1432,8 @@ Todos os endpoints sao acessados via Gateway na porta **8080** com o prefixo do 
 | GET | `/exames/solicitacoes/paciente/{pacienteId}` | MEDICO, PACIENTE, ADMIN | Listar solicitacoes do paciente |
 | GET | `/exames/solicitacoes/atendimento/{atendimentoId}` | MEDICO, ENFERMEIRO, ADMIN | Listar solicitacoes por atendimento |
 | DELETE | `/exames/solicitacoes/{id}` | MEDICO, ADMIN | Cancelar solicitacao |
-| POST | `/exames/agendamentos/agenda` | ADMIN | Criar agenda de exame |
-| GET | `/exames/agendamentos/vagas` | Autenticado | Buscar vagas (params: tipoExameId, dataInicio, dataFim) |
-| POST | `/exames/agendamentos` | PACIENTE, ATENDENTE, ADMIN | Agendar exame |
-| DELETE | `/exames/agendamentos/{id}` | PACIENTE, ADMIN | Cancelar agendamento de exame |
+
+**Nota:** Endpoints de agendamento de exame (`/exames/agendamentos/...`) foram migrados para o MS-Agendamento (ver secao "Agendamento - Exames" acima).
 
 ### Historico (`/historico/...`)
 
@@ -1382,9 +1464,10 @@ Todos os endpoints sao acessados via Gateway na porta **8080** com o prefixo do 
 | Regra | Descricao |
 |-------|-----------|
 | Solicitacao medica | Apenas medico (ou sistema) pode solicitar exame |
-| Agendamento sobre pendente | So permite agendar exame com solicitacao PENDENTE |
-| Vagas por slot | Multiplos pacientes podem agendar no mesmo horario (ate `vagasPorSlot`) |
-| Cancelamento retorna pendente | Cancelar agendamento retorna solicitacao para PENDENTE |
+| Agendamento sobre pendente | So permite agendar exame com solicitacao PENDENTE (verificado via solicitacaoExameId) |
+| Vagas por slot | Multiplos pacientes podem agendar no mesmo horario (ate `vagasPorSlot`) com lock pessimista |
+| Cancelamento retorna pendente | Cancelar agendamento publica evento RabbitMQ -> MS-Exames retorna solicitacao para PENDENTE |
+| Agendamento notifica | Agendar exame publica evento RabbitMQ -> MS-Exames atualiza solicitacao para AGENDADA |
 | Data futura | Agendamento de exame deve ser em data futura |
 
 ### Triagem
@@ -1432,20 +1515,35 @@ infrastructure/  Controllers, JPA, security, messaging, config - implementa os p
 
 Cada microsservico possui seu proprio banco de dados. Nao ha queries cross-database. A consistencia eventual eh garantida via eventos RabbitMQ.
 
-### Slots Persistidos vs Vagas Computadas
+### Slots Persistidos com Lock Pessimista
 
-| Aspecto | Consultas (slots) | Exames (vagas) |
-|---------|-------------------|----------------|
-| Armazenamento | Persistidos em `tb_horarios_disponiveis` | Computados em tempo real |
-| Concorrencia | `SELECT FOR UPDATE` (lock pessimista) | N vagas por slot, menor contencao |
-| Razao | 1 vaga por slot = alta contencao, precisa lock | N vagas por slot = contencao diluida |
+Tanto consultas quanto exames usam slots persistidos com `SELECT FOR UPDATE`:
+
+| Aspecto | Consultas | Exames |
+|---------|-----------|--------|
+| Tabela | `tb_horarios_disponiveis` | `tb_horarios_exame_disponiveis` |
+| Controle | Campo `ocupado` (boolean) | Campos `vagas_ocupadas` / `vagas_totais` |
+| Lock | `SELECT FOR UPDATE` no slot | `SELECT FOR UPDATE` no horario |
+| Vagas | 1 por slot | N por slot (ex: 3 coletas simultaneas) |
+
+### Separacao de Responsabilidades (Exames)
+
+O agendamento de exames foi refatorado para centralizar a logica de agenda no MS-Agendamento:
+
+| Responsabilidade | Servico | Justificativa |
+|-----------------|---------|---------------|
+| Cadastro de tipos de exame | MS-Exames | Dominio de exames |
+| Gestao de solicitacoes | MS-Exames | Dominio de exames |
+| Agendas, horarios, reserva de vagas | MS-Agendamento | Reutiliza a mesma logica de slots e lock pessimista das consultas |
+| Comunicacao de status | RabbitMQ (Agendamento -> Exames) | Desacoplamento entre servicos |
 
 ### Comunicacao
 
 | Tipo | Uso |
 |------|-----|
-| Sincrona (REST) | Gateway -> servicos; Servico -> Autenticacao (validar usuario) |
-| Assincrona (RabbitMQ) | Agendamento -> Historico/Notificacoes; Triagem -> Agendamento/Historico; Atendimento -> Exames |
+| Sincrona (REST via Gateway) | Cliente -> Gateway -> Servicos |
+| Sincrona (REST service-to-service) | Atendimento -> Agendamento (status da consulta); Agendamento -> Autenticacao (validar usuario) |
+| Assincrona (RabbitMQ) | Agendamento -> Historico/Notificacoes/Exames; Triagem -> Agendamento/Historico; Atendimento -> Exames |
 
 A comunicacao assincrona garante que o servico produtor nao fica bloqueado esperando consumidores processarem. Se um consumidor estiver fora do ar, as mensagens ficam na fila e sao processadas quando voltar.
 
@@ -1459,7 +1557,7 @@ Servicos se autenticam com `serviceId` + `serviceSecret` para obter JWT com `ROL
 
 O projeto inclui uma collection Postman completa para testar todos os fluxos:
 
-**Arquivo:** `Digi-SUS v3 - Testes Completos.postman_collection.json`
+**Arquivo:** `Digi-SUS v5 - Testes Completos.postman_collection.json`
 
 ### Como Usar
 
@@ -1490,6 +1588,5 @@ O projeto inclui uma collection Postman completa para testar todos os fluxos:
 
 ## 21. Videos
 
-[`Pitch`](https://youtu.be/Ymh1Utz_OAo)
-
-
+- [`Pitch do Problema`](https://youtu.be/Ymh1Utz_OAo)
+- [`Apresentacao Tecnica`](https://youtu.be/4qqU9U73Pcc)
