@@ -63,9 +63,14 @@ public class Agenda {
         }
 
         LocalTime slotAtual = horaInicio;
-        while (slotAtual.plusMinutes(duracaoSlotMinutos).compareTo(horaFim) <= 0) {
+        while (!slotAtual.isBefore(horaInicio) && slotAtual.isBefore(horaFim)) {
+            LocalTime fimDoSlot = slotAtual.plusMinutes(duracaoSlotMinutos);
+            // Se o fim do slot ultrapassar meia-noite (wrap-around) ou ultrapassar horaFim, para
+            if (fimDoSlot.isBefore(slotAtual) || fimDoSlot.isAfter(horaFim)) {
+                break;
+            }
             horarios.add(LocalDateTime.of(data, slotAtual));
-            slotAtual = slotAtual.plusMinutes(duracaoSlotMinutos);
+            slotAtual = fimDoSlot;
         }
 
         return horarios;
