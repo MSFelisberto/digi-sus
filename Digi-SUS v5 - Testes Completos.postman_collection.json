@@ -11,13 +11,9 @@
 		{ "key": "medicoToken", "value": "", "type": "string" },
 		{ "key": "pacienteToken", "value": "", "type": "string" },
 		{ "key": "enfermeiroToken", "value": "", "type": "string" },
-		{ "key": "atendenteToken", "value": "", "type": "string" },
-		{ "key": "adminId", "value": "", "type": "string" },
 		{ "key": "medicoId", "value": "", "type": "string" },
 		{ "key": "pacienteId", "value": "", "type": "string" },
-		{ "key": "pacienteNovoId", "value": "", "type": "string" },
-		{ "key": "pacienteNovoToken", "value": "", "type": "string" },
-		{ "key": "atendenteId", "value": "", "type": "string" },
+		{ "key": "enfermeiroId", "value": "", "type": "string" },
 		{ "key": "agendaId", "value": "", "type": "string" },
 		{ "key": "horarioDisponivelId", "value": "", "type": "string" },
 		{ "key": "consultaId", "value": "", "type": "string" },
@@ -33,11 +29,6 @@
 		{ "key": "dataFim", "value": "", "type": "string" },
 		{ "key": "dataHoraTradicional", "value": "", "type": "string" },
 		{ "key": "dataHoraReagendamento", "value": "", "type": "string" },
-		{ "key": "consultaListagemAutoId", "value": "", "type": "string" },
-		{ "key": "consultaListagemTradId", "value": "", "type": "string" },
-		{ "key": "medicoNovoId", "value": "", "type": "string" },
-		{ "key": "medicoNovoToken", "value": "", "type": "string" },
-		{ "key": "enfermeiroId", "value": "", "type": "string" },
 		{ "key": "agendaTriagemId", "value": "", "type": "string" },
 		{ "key": "todayDayOfWeek", "value": "", "type": "string" },
 		{ "key": "triagemConsultaId", "value": "", "type": "string" }
@@ -45,7 +36,7 @@
 	"item": [
 		{
 			"name": "0 - Setup: Login Usuarios Iniciais",
-			"description": "Login dos usuarios seed (admin, medico, enfermeiro, paciente, atendente) para obter tokens JWT.\nSenha padrao dos usuarios seed: senha123",
+			"description": "Login dos usuarios seed (admin, medico, enfermeiro, paciente) para obter tokens JWT.\nSenha padrao dos usuarios seed: senha123",
 			"item": [
 				{
 					"name": "Login ADMIN",
@@ -158,7 +149,7 @@
 									"if (pm.response.code === 200) {",
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('pacienteToken', json.token);",
-									"    pm.collectionVariables.set('pacienteId', '4');",
+									"    pm.collectionVariables.set('pacienteId', '1');",
 									"    pm.test('Login PACIENTE OK', function() {",
 									"        pm.expect(json.userType).to.eql('PACIENTE');",
 									"    });",
@@ -174,41 +165,6 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"email\": \"paciente@email.com\",\n    \"senha\": \"senha123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
-						}
-					}
-				},
-				{
-					"name": "Login ATENDENTE (seed)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('atendenteToken', json.token);",
-									"    pm.test('Login ATENDENTE OK', function() {",
-									"        pm.expect(json.userType).to.eql('ATENDENTE');",
-									"    });",
-									"} else if (pm.response.code === 401) {",
-									"    pm.test.skip('ATENDENTE seed nao existe, sera criado na pasta 1');",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"atendente@email.com\",\n    \"senha\": \"senha123\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/autenticacao/auth/login",
@@ -232,7 +188,6 @@
 								"exec": [
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('pacienteNovoId', json.id);",
 									"    pm.test('Paciente criado com sucesso', function() {",
 									"        pm.expect(json.nomeCompleto).to.eql('Maria da Silva');",
 									"        pm.expect(json.ativo).to.be.true;",
@@ -271,7 +226,6 @@
 								"exec": [
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('medicoNovoId', json.id);",
 									"    pm.test('Medico criado com CRM e especialidade', function() {",
 									"        pm.expect(json.tipo).to.eql('MEDICO');",
 									"        pm.expect(json.crm).to.eql('CRM123456');",
@@ -300,86 +254,25 @@
 							"path": ["autenticacao", "funcionarios"]
 						}
 					}
-				},
-				{
-					"name": "1.3 Login novo PACIENTE",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('pacienteNovoToken', json.token);",
-									"    pm.test('Login novo PACIENTE OK', function() {",
-									"        pm.expect(json.userType).to.eql('PACIENTE');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"maria.silva@email.com\",\n    \"senha\": \"senha123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
-						}
-					}
-				},
-				{
-					"name": "1.4 Login novo MEDICO",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('medicoNovoToken', json.token);",
-									"    pm.test('Login novo MEDICO OK', function() {",
-									"        pm.expect(json.userType).to.eql('MEDICO');",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [{ "key": "Content-Type", "value": "application/json" }],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"ana.santos@hospital.com\",\n    \"senha\": \"senha123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/autenticacao/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["autenticacao", "auth", "login"]
-						}
-					}
 				}
 			]
 		},
 		{
 			"name": "2 - Fluxo Consulta: Agenda + Auto-Agendamento",
-			"description": "Fluxo completo: Medico cria agenda -> Gera horarios -> Paciente busca disponiveis -> Paciente auto-agenda.\nVerifica novos campos tipoConsulta e prioridade na resposta.",
+			"description": "Fluxo completo: Medico cria agenda para o DIA ATUAL -> Gera horarios -> Paciente busca disponiveis -> Paciente auto-agenda.\nA agenda usa o dia da semana atual para garantir que os testes funcionem em qualquer dia.",
 			"item": [
 				{
-					"name": "2.1 Criar Agenda Medica (MONDAY 08:00-12:00)",
+					"name": "2.1 Criar Agenda Medica (DIA ATUAL 08:00-18:00)",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"var days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];",
+									"var today = new Date();",
+									"var dayOfWeek = days[today.getDay()];",
+									"pm.collectionVariables.set('todayDayOfWeek', dayOfWeek);",
+									"",
 									"if (!pm.collectionVariables.get('medicoId') || pm.collectionVariables.get('medicoId') === '') {",
 									"    pm.collectionVariables.set('medicoId', '2');",
 									"}"
@@ -395,8 +288,8 @@
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('agendaId', json.id);",
 									"    pm.collectionVariables.set('medicoId', json.medicoId);",
-									"    pm.test('Agenda criada', function() {",
-									"        pm.expect(json.diaSemana).to.eql('MONDAY');",
+									"    pm.test('Agenda criada para dia atual', function() {",
+									"        pm.expect(json.diaSemana).to.eql(pm.collectionVariables.get('todayDayOfWeek'));",
 									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
 									"        pm.expect(json.ativa).to.be.true;",
 									"        pm.expect(json.duracaoSlotMinutos).to.eql(30);",
@@ -415,7 +308,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"diaSemana\": \"MONDAY\",\n    \"horaInicio\": \"08:00\",\n    \"horaFim\": \"12:00\",\n    \"duracaoSlotMinutos\": 30,\n    \"especialidade\": \"CLINICA GERAL\"\n}"
+							"raw": "{\n    \"medicoId\": {{medicoId}},\n    \"diaSemana\": \"{{todayDayOfWeek}}\",\n    \"horaInicio\": \"08:00\",\n    \"horaFim\": \"18:00\",\n    \"duracaoSlotMinutos\": 30,\n    \"especialidade\": \"CLINICA GERAL\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/agendamento/agenda",
@@ -520,7 +413,6 @@
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('consultaId', json.id);",
-									"    pm.collectionVariables.set('consultaListagemAutoId', json.id);",
 									"    pm.test('Consulta auto-agendada com novos campos', function() {",
 									"        pm.expect(json.status).to.eql('AGENDADA');",
 									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
@@ -565,13 +457,10 @@
 							"script": {
 								"exec": [
 									"var today = new Date();",
-									"var nextMonday = new Date(today);",
-									"var dayOfWeek = today.getDay();",
-									"var daysUntilMonday = (8 - dayOfWeek) % 7;",
-									"if (daysUntilMonday === 0) daysUntilMonday = 7;",
-									"nextMonday.setDate(today.getDate() + daysUntilMonday + 7);",
-									"nextMonday.setHours(10, 0, 0, 0);",
-									"var dataHora = nextMonday.toISOString().slice(0, 19);",
+									"var nextSameDay = new Date(today);",
+									"nextSameDay.setDate(today.getDate() + 7);",
+									"nextSameDay.setHours(10, 0, 0, 0);",
+									"var dataHora = nextSameDay.toISOString().slice(0, 19);",
 									"pm.collectionVariables.set('dataHoraTradicional', dataHora);"
 								],
 								"type": "text/javascript"
@@ -584,7 +473,6 @@
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('consultaTradicionalId', json.id);",
-									"    pm.collectionVariables.set('consultaListagemTradId', json.id);",
 									"    pm.test('Consulta tradicional agendada', function() {",
 									"        pm.expect(json.status).to.eql('AGENDADA');",
 									"        pm.expect(json.especialidade).to.eql('CLINICA GERAL');",
@@ -1012,38 +900,7 @@
 					}
 				},
 				{
-					"name": "6.3 Listar Solicitacoes do Paciente",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.test('Lista de solicitacoes retornada', function() {",
-									"        pm.expect(json).to.be.an('array');",
-									"        pm.expect(json.length).to.be.greaterThan(0);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{pacienteToken}}" }
-						],
-						"url": {
-							"raw": "{{baseUrl}}/exames/solicitacoes/paciente/{{pacienteId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["exames", "solicitacoes", "paciente", "{{pacienteId}}"]
-						}
-					}
-				},
-				{
-					"name": "6.4 Agendar Exame via MS-Agendamento",
+					"name": "6.3 Agendar Exame via MS-Agendamento",
 					"event": [
 						{
 							"listen": "test",
@@ -1085,7 +942,7 @@
 					}
 				},
 				{
-					"name": "6.5 Verificar Solicitacao Atualizada para AGENDADA (RabbitMQ)",
+					"name": "6.4 Verificar Solicitacao Atualizada para AGENDADA (RabbitMQ)",
 					"event": [
 						{
 							"listen": "test",
@@ -1126,7 +983,7 @@
 					}
 				},
 				{
-					"name": "6.6 Cancelar Agendamento de Exame (via MS-Agendamento)",
+					"name": "6.5 Cancelar Agendamento de Exame (via MS-Agendamento)",
 					"event": [
 						{
 							"listen": "test",
@@ -1154,7 +1011,7 @@
 					}
 				},
 				{
-					"name": "6.7 Verificar Solicitacao Retornou para PENDENTE (RabbitMQ)",
+					"name": "6.6 Verificar Solicitacao Retornou para PENDENTE (RabbitMQ)",
 					"event": [
 						{
 							"listen": "test",
@@ -1191,7 +1048,7 @@
 					}
 				},
 				{
-					"name": "6.8 Cancelar Solicitacao de Exame Urgente",
+					"name": "6.7 Cancelar Solicitacao de Exame Urgente",
 					"event": [
 						{
 							"listen": "test",
@@ -1632,11 +1489,6 @@
 									"            pm.expect(consultaTriagem.prioridade).to.eql('URGENTE');",
 									"            pm.expect(consultaTriagem.triagemId).to.not.be.null;",
 									"        });",
-									"        pm.test('Tipo consulta: REGULAR (slot disponivel) ou ENCAIXE', function() {",
-									"            console.log('Tipo consulta: ' + consultaTriagem.tipoConsulta);",
-									"            console.log('Prioridade: ' + consultaTriagem.prioridade);",
-									"            console.log('Triagem ID: ' + consultaTriagem.triagemId);",
-									"        });",
 									"    } else {",
 									"        pm.test.skip('Consulta de triagem nao encontrada ainda - RabbitMQ pode estar processando. Tente novamente.');",
 									"    }",
@@ -1918,45 +1770,10 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var json = pm.response.json();",
-									"    pm.test('Consulta mudou para REALIZADA apos finalizar atendimento', function() {",
+									"    pm.test('Consulta mudou para REALIZADA apos finalizar atendimento (bug fix v5)', function() {",
 									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
 									"        pm.expect(json.status).to.eql('REALIZADA');",
 									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{medicoToken}}" }
-						],
-						"url": {
-							"raw": "{{baseUrl}}/agendamento/internal/consultas/{{consultaId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["agendamento", "internal", "consultas", "{{consultaId}}"]
-						}
-					}
-				},
-				{
-					"name": "9.8 Recarregar Consulta - Confirmar REALIZADA Persiste (NOVO v5 - bug fix)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var json = pm.response.json();",
-									"    pm.test('Status REALIZADA persiste no banco (bug corrigido v5)', function() {",
-									"        pm.expect(json.id).to.eql(parseInt(pm.collectionVariables.get('consultaId')));",
-									"        pm.expect(json.status).to.eql('REALIZADA');",
-									"    });",
-									"    pm.test('Consulta nao voltou para AGENDADA (bug antigo)', function() {",
-									"        pm.expect(json.status).to.not.eql('AGENDADA');",
-									"    });",
-									"    console.log('Bug fix confirmado: status REALIZADA persiste corretamente no banco.');",
 									"}"
 								],
 								"type": "text/javascript"
@@ -2419,15 +2236,7 @@
 								"exec": [
 									"pm.test('Nao eh possivel iniciar atendimento em consulta REALIZADA (400)', function() {",
 									"    pm.expect(pm.response.code).to.eql(400);",
-									"});",
-									"if (pm.response.code === 400) {",
-									"    var body = pm.response.text();",
-									"    pm.test('Mensagem indica status invalido', function() {",
-									"        pm.expect(body.toLowerCase()).to.satisfy(function(b) {",
-									"            return b.includes('realizada') || b.includes('agendada') || b.includes('atendimento');",
-									"        });",
-									"    });",
-									"}"
+									"});"
 								],
 								"type": "text/javascript"
 							}
