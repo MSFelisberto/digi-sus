@@ -5,12 +5,15 @@ Plataforma de servicos de saude do SUS (Sistema Unico de Saude) construida em ar
 # Projeto FIAP
 
 Equipe: Grupo 32
+<br>
 Integrantes: Marcos Felisberto, Fernando César Bertolo Júnior, Heider Bezerra Soares, Leonardo Doretto Mattioli
+<br>
 Data: Fevereiro de 2026
 
-Videos de Apresentação:
-[Pitch do Problema](https://www.youtube.com/watch?v=Ymh1Utz_OAo)
-[Apresentação Tecnica](https://youtu.be/4qqU9U73Pcc)
+Videos de Apresentação
+---
+* [Pitch do Problema](https://www.youtube.com/watch?v=Ymh1Utz_OAo)
+* [Apresentação Tecnica](https://youtu.be/4qqU9U73Pcc)
 
 ---
 
